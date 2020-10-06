@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ClienteListaDto;
 import com.grandson.apigrandson.controller.cliente.dto.ListaParceirosDisponiveisDto;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
@@ -37,18 +39,6 @@ import com.grandson.apigrandson.repository.ServicoRepository;
 @RequestMapping("api/parceiro/servico")
 public class ServicosParceiroController {
 
-	/*
-	 * | URL's Servico Cliente 			|
-	 * | 
-	 * | Aceitar Serviço				| Detalhe do Serviço	|OK
-	 * | Cancelar Serciço				| HTTP 200/404			|OK
-	 * | Detalhar Serviço				| Detalhe do Serviço	|OK
-	 * | Listar serviços agendados		| Lista Parceiros		|OK
-	 * | Listar serviços concluídos		| Listar Parceiros		|OK
-	 * | Avaliar Serviço				| HTTP 200/404			|OK
-	 * 
-	 * */
-	
 	@Autowired
 	private ServicoRepository servicoRepository;
 	
@@ -61,16 +51,25 @@ public class ServicosParceiroController {
 	@Autowired 
  	private ComentarioRepository comentarioRepository;
 	
+	@Autowired
+	private TokenService tokenService;
 	
-	@GetMapping("/agendados/{id}")
-	public List<ServicosAgendadosDto> listarProximosServicos(@PathVariable Long id){
+	
+	@GetMapping("/agendados")
+	public List<ServicosAgendadosDto> listarProximosServicos(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Parceiro parceiro = parceiroRepository.getOne(id);
 		List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.ACEITO);
 		return ServicosAgendadosDto.converte(clientes);
 	}
 	
-	@GetMapping("/concluidos/{id}")
-	public List<ServicosAgendadosDto> listarServicosConcluidos(@PathVariable Long id){
+	@GetMapping("/concluidos")
+	public List<ServicosAgendadosDto> listarServicosConcluidos(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Parceiro parceiro = parceiroRepository.getOne(id);
 		List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.AVALIADO, StatusServico.CONCLUIDO);
 		return ServicosAgendadosDto.converte(clientes);

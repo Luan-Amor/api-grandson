@@ -10,21 +10,25 @@ import lombok.Getter;
 @Getter
 public class ServicoDetalhadoParceiroDto {
 
+	private Long idParceiro;
 	private Long idServico;
 	private String nome;
 	private String nota; 
 	private double valor;
 	private String telefone;
 	private int quantidadeHoras;
+	private String foto;
 	private String horario;
 	private String dia;
 	
 	public ServicoDetalhadoParceiroDto() {}
 	
 	public ServicoDetalhadoParceiroDto(Servico servico) {
+		this.idParceiro = servico.getParceiro().getId();
 		this.nome = servico.getParceiro().getNome();
 		this.nota = servico.getParceiro().getNota();
 		this.telefone = servico.getParceiro().getTelefone();
+		this.foto = new String(servico.getParceiro().getFoto().getData());			
 		
 		this.idServico = servico.getId();
 		this.valor = servico.getValor();

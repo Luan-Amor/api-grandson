@@ -25,7 +25,6 @@ public class Foto {
 	public Foto() {}
 
 	public Foto(String nome, String type, byte[] data) {
-		super();
 		this.nome = nome;
 		this.type = type;
 		this.data = data;

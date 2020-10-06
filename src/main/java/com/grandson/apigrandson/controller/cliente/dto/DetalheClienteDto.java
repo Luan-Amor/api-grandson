@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.cliente.dto;
 import java.time.LocalDateTime;
 
 import com.grandson.apigrandson.models.Cliente;
+import com.grandson.apigrandson.models.Foto;
 
 import lombok.Getter;
 
@@ -15,6 +16,7 @@ public class DetalheClienteDto {
 	private String telefone;
 	private LocalDateTime dataInicio;
 	private String nota;
+	private Foto foto;
 	
 	public DetalheClienteDto() {}
 	
@@ -25,6 +27,7 @@ public class DetalheClienteDto {
 		this.email = cliente.getEmail();
 		this.dataInicio = cliente.getDataInicio();
 		this.nota = cliente.getNota();
+		this.foto = cliente.getFoto();
 	}
 	
 	

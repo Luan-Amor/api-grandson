@@ -4,6 +4,9 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ClienteListaDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheCartaoDeCreditoDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheClienteDto;
@@ -34,6 +38,7 @@ import com.grandson.apigrandson.models.Parceiro;
 import com.grandson.apigrandson.repository.CartaoDeCreditoRepository;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
+import com.grandson.apigrandson.repository.FotoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 
 @RestController
@@ -52,29 +57,11 @@ public class ClienteController {
 	@Autowired
 	private CartaoDeCreditoRepository cartaoDeCreditoRepository;
 	
-//	@GetMapping
-//	public List<ClienteListaDto> lista(){
-//		List<Cliente> clientes = clienteRespository.findAll();
-//		return ClienteListaDto.converte(clientes);
-//	}
+	@Autowired
+	private FotoRepository fotoRepository;
 	
-	/*
-	 * |URL's Cliente
-	 * |Home 					| Lista de parceiros 		|OK
-	 * |Agendamento 			| Lista Serviços Pendentes	|OK
-	 * |Perfil					| Detalhe Cliente			|OK
-	 * |Cadastrar Cliente		| HTTP 200					|Ok
-	 * |Detalhar Parceiro		| detalhe parceiro			|OK
-	 * |Cartao de Credito		| Detalhe cartao de credito	|OK
-	 * |Alterar dados Cliente	| Detalhe cliente			|Ok
-	 * |Alterar dados Cartão	| Detalhe Cartão			|OK
-	 * |Deletar dados Cartão	| Detalhe Cartão			|OK
-	 * |#######################################################
-	 * |Deletar Cliente 		| Http 200/404				|
-	 * |Esqueci a senha			| SMS						|
-	 * 
-	 * */
-	
+	@Autowired
+	private TokenService tokenService;
 	
 	@GetMapping("/home")
 	public List<ListaParceiroDto> listarParceiros(){
@@ -91,17 +78,11 @@ public class ClienteController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PostMapping("/login")
-	public ResponseEntity<DetalheClienteDto> login(@RequestBody LoginClienteForm form){
-		Optional<Cliente> cliente = clienteRespository.findByEmail(form.getEmail());
-		if(cliente.isPresent()) {
-			ResponseEntity.ok(new DetalheClienteDto(cliente.get()));
-		}
-		return ResponseEntity.notFound().build();
-	}
-	
-	@GetMapping("/perfil/{id}")
-	public ResponseEntity<PerfilClienteDto> detalharCliente(@PathVariable long id){
+	@GetMapping("/perfil")
+	public ResponseEntity<PerfilClienteDto> detalharCliente(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Cliente> cliente = clienteRespository.findById(id);
 		if(cliente.isPresent()) {
 			return ResponseEntity.ok(new PerfilClienteDto(cliente.get()));
@@ -109,8 +90,11 @@ public class ClienteController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@GetMapping("/perfil/carteira/{id}")
-	public ResponseEntity<DetalheCartaoDeCreditoDto> detalharCartaoDeCredito(@PathVariable long id){
+	@GetMapping("/perfil/carteira")
+	public ResponseEntity<DetalheCartaoDeCreditoDto> detalharCartaoDeCredito(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Cliente> cliente = clienteRespository.findById(id);
 		if(cliente.isPresent()) {
 			Optional<CartaoDeCredito> cartao = cartaoDeCreditoRepository.findById(cliente.get().getCartao().getId());
@@ -123,9 +107,11 @@ public class ClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody ClienteForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody @Valid ClienteForm form, UriComponentsBuilder uriBuilder) {
+		
 		Cliente cliente = form.converter();
 		
+		fotoRepository.save(cliente.getFoto());
 		cartaoDeCreditoRepository.save(cliente.getCartao());
 		enderecoRepository.save(cliente.getEndereco());
 		clienteRespository.save(cliente);
@@ -134,21 +120,27 @@ public class ClienteController {
 		return ResponseEntity.created(uri).body(new PerfilClienteDto(cliente));
 	}
 	
-	@DeleteMapping("/{id}")
-	@Transactional
-	public ResponseEntity<?> deletar(@PathVariable Long id) {
-		Optional<Cliente> cliente = clienteRespository.findById(id);
-		
-		if(cliente.isPresent()) {
-			clienteRespository.deleteById(id);
-			return ResponseEntity.ok().build();
-		}
-		return ResponseEntity.notFound().build();
-	}
+//	@DeleteMapping("/deletar")
+//	@Transactional
+//	public ResponseEntity<?> deletar(HttpServletRequest request) {
+//		String token = tokenService.recuperarToken(request);
+//		Long id = tokenService.getIdUsuario(token);
+//		
+//		Optional<Cliente> cliente = clienteRespository.findById(id);
+//		
+//		if(cliente.isPresent()) {
+//			clienteRespository.deleteById(id);
+//			return ResponseEntity.ok().build();
+//		}
+//		return ResponseEntity.notFound().build();
+//	}
 	
-	@PutMapping("/{id}")
+	@PutMapping
 	@Transactional
-	public ResponseEntity<PerfilClienteDto> alterar(@PathVariable Long id, @RequestBody ClienteAtualizacaoForm form) {
+	public ResponseEntity<PerfilClienteDto> alterar(HttpServletRequest request, @RequestBody ClienteAtualizacaoForm form) {
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Cliente> optional = clienteRespository.findById(id);
 		if(optional.isPresent()) {
 			Cliente cliente = form.atualiza(id, clienteRespository);
@@ -157,10 +149,13 @@ public class ClienteController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PutMapping("/carteira/{id}")
+	@PutMapping("/carteira")
 	@Transactional
-	public ResponseEntity<DetalheCartaoDeCreditoDto> alterarCartao(@PathVariable Long id, 
+	public ResponseEntity<DetalheCartaoDeCreditoDto> alterarCartao(HttpServletRequest request, 
 									@RequestBody ClienteCartaoAtualizacaoForm form) {
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Cliente> optional = clienteRespository.findById(id);
 		if(optional.isPresent()) {
 			CartaoDeCredito cartao = form.atualiza(optional.get(), cartaoDeCreditoRepository);

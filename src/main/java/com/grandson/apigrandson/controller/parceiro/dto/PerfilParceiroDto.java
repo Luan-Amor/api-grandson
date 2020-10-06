@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import com.grandson.apigrandson.models.Comentario;
+import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
 
 import lombok.Getter;
@@ -18,6 +19,7 @@ public class PerfilParceiroDto {
 	private String telefone;
 	private String nota;
 	private String endereco;
+	private Foto foto;
 	private Long cep;
 	private String complemento;
 	private int numero;
@@ -37,6 +39,10 @@ public class PerfilParceiroDto {
 		this.quantidadeServico = parceiro.getQuantidadeServicos();
 		this.dataInicio = parceiro.getDataInicio();
 		this.comentarios = parceiro.getComentarios();
+		
+		if(parceiro.getFoto() != null) 
+			this.foto = parceiro.getFoto();
+		
 		
 		this.endereco = parceiro.getEndereco().getEndereco();
 		this.cep = parceiro.getEndereco().getCep();

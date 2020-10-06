@@ -4,6 +4,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
 import com.grandson.apigrandson.controller.cliente.form.AtualizarServicoForm;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
@@ -39,19 +41,6 @@ import lombok.Getter;
 @RequestMapping("api/cliente/servico")
 public class ServicoClienteController {
 
-	/*
-	 * | URL's Servico Cliente 			|
-	 * | 
-	 * | Cadastrar Serviço				| Detalhe do Serviço	|
-	 * | Cancelar Serciço				| HTTP 200/404			|OK
-	 * | Detalhar Serviço				| Detalhe do Serviço	|Ok
-	 * | Listar serviços agendados		| Lista Parceiros		|Ok
-	 * | Listar serviços concluídos		| Listar Parceiros		|OK
-	 * | Avaliar Serviço				| HTTP 200/404			|OK
-	 * 
-	 * */
-	
-	
 	@Autowired
 	private ParceiroRepository parceiroRepository;
 	
@@ -67,15 +56,24 @@ public class ServicoClienteController {
 	@Autowired
 	private ComentarioRepository comentarioRepository;
 	
-	@GetMapping("/agendados/{id}")
-	public List<ServicoDisponiveisDto> listarProximosServicos(@PathVariable Long id){
+	@Autowired
+	private TokenService tokenService;
+	
+	@GetMapping("/agendados")
+	public List<ServicoDisponiveisDto> listarProximosServicos(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Cliente cliente = clienteRepository.getOne(id);
 		List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
 		return ServicoDisponiveisDto.converte(parceiros);
 	}
 	
-	@GetMapping("/finalizados/{id}")
-	public List<ServicoDisponiveisDto> listarServicosConcluidos(@PathVariable Long id){
+	@GetMapping("/finalizados")
+	public List<ServicoDisponiveisDto> listarServicosConcluidos(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Cliente cliente = clienteRepository.getOne(id);
 		List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.FINALIZADO);
 		return ServicoDisponiveisDto.converte(parceiros);

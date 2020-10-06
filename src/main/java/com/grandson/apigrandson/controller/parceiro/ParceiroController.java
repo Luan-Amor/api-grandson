@@ -4,6 +4,8 @@ import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheCartaoDeCreditoDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.ClienteCartaoAtualizacaoForm;
@@ -37,6 +40,7 @@ import com.grandson.apigrandson.models.StatusServico;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ContaCorrenteRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
+import com.grandson.apigrandson.repository.FotoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 import com.grandson.apigrandson.repository.ServicoRepository;
 
@@ -44,20 +48,6 @@ import com.grandson.apigrandson.repository.ServicoRepository;
 @RequestMapping("api/parceiro")
 public class ParceiroController{
 
-	/*
-	 * | URL's Parceiro |
-	 * | 
-	 * | Login						| TokenDto					|Ok
-	 * | Home						| lista servicos Pendentes	|OK
-	 * | Perfil Cliente				| Detalhe Cliente			|Ok
-	 * | Perfil						| Detalhe Parceiro			|OK
-	 * | Cadastrar Parceiro			| Detalhe Parceiro			|Ok
-	 * | Alterar parceiro			| Perfil Parceiro			|
-	 * | Detalhar Cartão			| Detalhe Cartão			|Ok
-	 * | Alterar Cartão				| Detalhe Cartão			|Ok
-	 * | Esqueci a senha			| SMS /  EMAIL				|Ok
-	 * */
-	
 	@Autowired
 	private ParceiroRepository parceiroRepository;
 	
@@ -70,17 +60,30 @@ public class ParceiroController{
 	@Autowired
 	private ContaCorrenteRepository contaCorrenteRepository;
 	
-	@Autowired EnderecoRepository enderecoRepository;
+	@Autowired 
+	private EnderecoRepository enderecoRepository;
 	
-	@GetMapping("/home/{id}")
-	public List<ServicoDisponiveisDto> servicosDisponiveis(@PathVariable Long id){
+	@Autowired
+	private FotoRepository fotoRepository;
+	
+	@Autowired
+	private TokenService tokenService;
+	
+	@GetMapping("/home")
+	public List<ServicoDisponiveisDto> servicosDisponiveis(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Parceiro parceiro = parceiroRepository.getOne(id);
 		List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
 		return ServicoDisponiveisDto.converte(servicos);
 	}
 	
-	@GetMapping("/perfil/{id}")
-	public ResponseEntity<PerfilParceiroDto> perfil(@PathVariable Long id){
+	@GetMapping("/perfil")
+	public ResponseEntity<PerfilParceiroDto> perfil(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
 		if(parceiro.isPresent()) {
 			return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
@@ -93,15 +96,6 @@ public class ParceiroController{
 		Optional<Cliente> cliente = clienteRepository.findById(id);
 		if(cliente.isPresent()) {
 			return ResponseEntity.ok(new DetalheClienteDto(cliente.get()));
-		}
-		return ResponseEntity.notFound().build();
-	}
-	
-	@PostMapping("/login")
-	public ResponseEntity<PerfilParceiroDto> login(@RequestBody LoginClienteForm form){
-		Optional<Parceiro> cliente = parceiroRepository.findByEmail(form.getEmail());
-		if(cliente.isPresent()) {
-			ResponseEntity.ok(new PerfilParceiroDto(cliente.get()));
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -123,8 +117,11 @@ public class ParceiroController{
 		return ResponseEntity.badRequest().build();
 	}
 	
-	@GetMapping("/perfil/carteira/{id}")
-	public ResponseEntity<DetalheContaCorrenteDto> detalharCartaoDeCredito(@PathVariable long id){
+	@GetMapping("/perfil/carteira")
+	public ResponseEntity<DetalheContaCorrenteDto> detalharCartaoDeCredito(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
 		if(parceiro.isPresent()) {
 			Optional<ContaCorrente> cartao = contaCorrenteRepository.findById(parceiro.get().getConta().getId());
@@ -136,33 +133,39 @@ public class ParceiroController{
 	}
 	
 	
-	@PutMapping("/{id}")
+	@PutMapping
 	@Transactional
-	public ResponseEntity<PerfilParceiroDto> alterar(@RequestBody ParceiroAtualizaForm form, @PathVariable Long id){
+	public ResponseEntity<PerfilParceiroDto> alterar(@RequestBody ParceiroAtualizaForm form, HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Parceiro> optional = parceiroRepository.findById(id);
 		if(optional.isPresent()) {
-			Parceiro parceiro = form.atualizar(id, parceiroRepository);
+			Parceiro parceiro = form.atualizar(id, parceiroRepository, enderecoRepository, fotoRepository);
 			
 			return ResponseEntity.ok(new PerfilParceiroDto(parceiro));
 		}
 		return ResponseEntity.notFound().build();
 	}
 	
-	@DeleteMapping("/{id}")
-	@Transactional
-	public ResponseEntity<?> deletar(@PathVariable Long id){
-		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
-		if(parceiro.isPresent()) {
-			parceiroRepository.deleteById(id);
-			return ResponseEntity.ok().build();
-		}
-		return ResponseEntity.notFound().build();
-	}
+//	@DeleteMapping("/{id}")
+//	@Transactional
+//	public ResponseEntity<?> deletar(@PathVariable Long id){
+//		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
+//		if(parceiro.isPresent()) {
+//			parceiroRepository.deleteById(id);
+//			return ResponseEntity.ok().build();
+//		}
+//		return ResponseEntity.notFound().build();
+//	}
 	
-	@PutMapping("/perfil/carteira/{id}")
+	@PutMapping("/perfil/carteira")
 	@Transactional
-	public ResponseEntity<DetalheContaCorrenteDto> alterarCartao(@PathVariable Long id, 
+	public ResponseEntity<DetalheContaCorrenteDto> alterarCartao(HttpServletRequest request, 
 									@RequestBody contaCorrenteAtualizacaoForm form) {
+		String token = tokenService.recuperarToken(request);
+		Long id = tokenService.getIdUsuario(token);
+		
 		Optional<Parceiro> optional = parceiroRepository.findById(id);
 		if(optional.isPresent()) {
 			ContaCorrente cartao = form.atualiza(optional.get(), contaCorrenteRepository);
