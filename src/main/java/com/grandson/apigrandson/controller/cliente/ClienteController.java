@@ -105,7 +105,6 @@ public class ClienteController {
 		
 		Cliente cliente = form.converter();
 		
-		fotoRepository.save(cliente.getFoto());
 		cartaoDeCreditoRepository.save(cliente.getCartao());
 		enderecoRepository.save(cliente.getEndereco());
 		clienteRespository.save(cliente);
