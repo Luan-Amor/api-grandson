@@ -29,10 +29,6 @@ public class ClienteForm {
 	@NotNull @NotEmpty
 	private String telefone;
 	
-	private String foto;
-	private String type;
-	private String nomeFoto;
-	
 	private String endereco;
 	private Long cep;
 	private int numero;
@@ -46,10 +42,9 @@ public class ClienteForm {
 	public Cliente converter() {
 		Date data = Date.from(dataValidade.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		
-		Foto foto = new Foto(nomeFoto, type, this.foto.getBytes());
 		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento);
 		CartaoDeCredito cartao = new CartaoDeCredito(nomeCartao, numeroCartao, cvv, data);
-		return new Cliente(this.nome, this.email, this.cpf, this.senha, telefone, endereco, cartao, foto);
+		return new Cliente(this.nome, this.email, this.cpf, this.senha, telefone, endereco, cartao);
 	}
 
 }

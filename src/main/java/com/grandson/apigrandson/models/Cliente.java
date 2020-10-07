@@ -61,7 +61,7 @@ public class Cliente implements UserDetails, Serializable{
 	
 	public Cliente() {}
 	
-	public Cliente(String nome, String email, String cpf, String senha,String telefone, Endereco endereco, CartaoDeCredito cartao, Foto foto) {
+	public Cliente(String nome, String email, String cpf, String senha,String telefone, Endereco endereco, CartaoDeCredito cartao) {
 		this.nome = nome;
 		this.email = email;
 		this.cpf = cpf;
@@ -69,8 +69,6 @@ public class Cliente implements UserDetails, Serializable{
 		this.endereco = endereco;
 		this.cartao = cartao;
 		this.telefone = telefone;
-		this.foto = foto;
-		
 	}
 
 	@Override
