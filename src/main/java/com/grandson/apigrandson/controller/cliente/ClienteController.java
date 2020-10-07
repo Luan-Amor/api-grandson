@@ -1,6 +1,5 @@
 package com.grandson.apigrandson.controller.cliente;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,7 +9,6 @@ import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,18 +16,14 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.grandson.apigrandson.config.security.TokenService;
-import com.grandson.apigrandson.controller.cliente.dto.ClienteListaDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheCartaoDeCreditoDto;
-import com.grandson.apigrandson.controller.cliente.dto.DetalheClienteDto;
 import com.grandson.apigrandson.controller.cliente.dto.PerfilClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.ClienteAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.ClienteCartaoAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.ClienteForm;
 import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
-import com.grandson.apigrandson.controller.cliente.form.LoginClienteForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ListaParceiroDto;
 import com.grandson.apigrandson.models.CartaoDeCredito;
@@ -107,7 +101,7 @@ public class ClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody @Valid ClienteForm form, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody @Valid ClienteForm form) {
 		
 		Cliente cliente = form.converter();
 		
@@ -116,8 +110,7 @@ public class ClienteController {
 		enderecoRepository.save(cliente.getEndereco());
 		clienteRespository.save(cliente);
 		
-		URI uri = uriBuilder.path("/perfil/{id}").buildAndExpand(cliente.getId()).toUri();
-		return ResponseEntity.created(uri).body(new PerfilClienteDto(cliente));
+		return ResponseEntity.ok(new PerfilClienteDto(cliente));
 	}
 	
 //	@DeleteMapping("/deletar")
@@ -170,7 +163,6 @@ public class ClienteController {
 		if(cliente.isPresent()) {
 			return ResponseEntity.ok().build();
 		}
-		
 		return ResponseEntity.notFound().build();
 	}
 }

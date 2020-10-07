@@ -1,16 +1,13 @@
 package com.grandson.apigrandson.controller.cliente;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -18,11 +15,9 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
-import com.grandson.apigrandson.controller.cliente.form.AtualizarServicoForm;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
@@ -90,12 +85,11 @@ public class ServicoClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(@RequestBody FormNovoServico form, UriComponentsBuilder uriBuilder){
+	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(@RequestBody FormNovoServico form){
 		Servico servico = FormNovoServico.converte(form, parceiroRepository, clienteRepository);
 		servicoRepository.save(servico);
 		
-		URI uri = uriBuilder.path("api/cliente/servico/detalhar/{id}").buildAndExpand(servico.getId()).toUri();
-		return ResponseEntity.created(uri).body(new ServicoDetalhadoParceiroDto(servico));
+		return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
 	}
 	
 	@PutMapping("/cancelar/{id}")
