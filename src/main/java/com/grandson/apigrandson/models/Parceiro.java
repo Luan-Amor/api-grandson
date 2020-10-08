@@ -64,7 +64,7 @@ public class Parceiro implements UserDetails{
 	public Parceiro() {}
 	
 	public Parceiro(String nome, String email, String cpf, String telefone, 
-			String senha, Endereco endereco, ContaCorrente cc, Foto foto) {
+			String senha, Endereco endereco, ContaCorrente cc) {
 		this.nome = nome;
 		this.email = email;
 		this.cpf = cpf;
@@ -72,7 +72,6 @@ public class Parceiro implements UserDetails{
 		this.senha = senha;
 		this.endereco = endereco;
 		this.conta = cc;
-		this.foto = foto;
 	}
 
 	@Override

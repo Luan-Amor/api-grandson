@@ -12,6 +12,7 @@ import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Endereco;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.repository.FotoRepository;
+import com.grandson.apigrandson.util.GerarHashSenhaUtil;
 
 import lombok.Data;
 
@@ -42,9 +43,11 @@ public class ClienteForm {
 	public Cliente converter() {
 		Date data = Date.from(dataValidade.atStartOfDay(ZoneId.systemDefault()).toInstant());
 		
+		String hash = GerarHashSenhaUtil.gerarHash(senha);
+		
 		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento);
 		CartaoDeCredito cartao = new CartaoDeCredito(nomeCartao, numeroCartao, cvv, data);
-		return new Cliente(this.nome, this.email, this.cpf, this.senha, telefone, endereco, cartao);
+		return new Cliente(this.nome, this.email, this.cpf, hash, telefone, endereco, cartao);
 	}
 
 }

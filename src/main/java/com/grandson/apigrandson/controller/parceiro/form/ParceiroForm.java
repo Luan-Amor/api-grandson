@@ -4,6 +4,7 @@ import com.grandson.apigrandson.models.ContaCorrente;
 import com.grandson.apigrandson.models.Endereco;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
+import com.grandson.apigrandson.util.GerarHashSenhaUtil;
 
 import lombok.Getter;
 
@@ -21,10 +22,6 @@ public class ParceiroForm {
 	private int numero;
 	private Long cep;
 	
-	private String foto;
-	private String type;
-	private String nomeFoto;
-	
 	private int agencia;
 	private int conta;
 	private String banco;
@@ -32,10 +29,11 @@ public class ParceiroForm {
 	
 	public Parceiro converter() {
 		
-		Foto foto = new Foto(nomeFoto, type, this.foto.getBytes());
+		String hash = GerarHashSenhaUtil.gerarHash(senha);
+		
 		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento);
 		ContaCorrente cc = new ContaCorrente(agencia, conta, banco, tipo);
-		return new Parceiro(nome, email, cpf, telefone, senha, endereco, cc, foto);
+		return new Parceiro(nome, email, cpf, telefone, hash, endereco, cc);
 	}
 
 }
