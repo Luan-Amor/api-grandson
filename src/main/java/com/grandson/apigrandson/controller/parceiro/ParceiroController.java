@@ -72,30 +72,39 @@ public class ParceiroController{
 	@GetMapping("/home")
 	public List<ServicoDisponiveisDto> servicosDisponiveis(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Parceiro parceiro = parceiroRepository.getOne(id);
-		List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
-		return ServicoDisponiveisDto.converte(servicos);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Parceiro parceiro = parceiroRepository.getOne(id);
+			List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
+			return ServicoDisponiveisDto.converte(servicos);
+		}
+		return null;
 	}
 	
 	@GetMapping("/perfil")
 	public ResponseEntity<PerfilParceiroDto> perfil(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
-		if(parceiro.isPresent()) {
-			return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Parceiro> parceiro = parceiroRepository.findById(id);
+			if(parceiro.isPresent()) {
+				return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
+			}
 		}
+		
 		return ResponseEntity.notFound().build();
 	}
 	
 	@GetMapping("/perfil/cliente/{id}")
-	public ResponseEntity<DetalheClienteDto> perfilCliente(@PathVariable Long id){
-		Optional<Cliente> cliente = clienteRepository.findById(id);
-		if(cliente.isPresent()) {
-			return ResponseEntity.ok(new DetalheClienteDto(cliente.get()));
+	public ResponseEntity<DetalheClienteDto> perfilCliente(HttpServletRequest request, @PathVariable Long id){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Optional<Cliente> cliente = clienteRepository.findById(id);
+			if(cliente.isPresent()) {
+				return ResponseEntity.ok(new DetalheClienteDto(cliente.get()));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -120,13 +129,15 @@ public class ParceiroController{
 	@GetMapping("/perfil/carteira")
 	public ResponseEntity<DetalheContaCorrenteDto> detalharCartaoDeCredito(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
-		if(parceiro.isPresent()) {
-			Optional<ContaCorrente> cartao = contaCorrenteRepository.findById(parceiro.get().getConta().getId());
-			if(cartao.isPresent()) {
-				return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao.get()));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Parceiro> parceiro = parceiroRepository.findById(id);
+			if(parceiro.isPresent()) {
+				Optional<ContaCorrente> cartao = contaCorrenteRepository.findById(parceiro.get().getConta().getId());
+				if(cartao.isPresent()) {
+					return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao.get()));
+				}
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -137,13 +148,15 @@ public class ParceiroController{
 	@Transactional
 	public ResponseEntity<PerfilParceiroDto> alterar(@RequestBody ParceiroAtualizaForm form, HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Parceiro> optional = parceiroRepository.findById(id);
-		if(optional.isPresent()) {
-			Parceiro parceiro = form.atualizar(id, parceiroRepository, enderecoRepository, fotoRepository);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
 			
-			return ResponseEntity.ok(new PerfilParceiroDto(parceiro));
+			Optional<Parceiro> optional = parceiroRepository.findById(id);
+			if(optional.isPresent()) {
+				Parceiro parceiro = form.atualizar(id, parceiroRepository, enderecoRepository, fotoRepository);
+				
+				return ResponseEntity.ok(new PerfilParceiroDto(parceiro));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -164,12 +177,14 @@ public class ParceiroController{
 	public ResponseEntity<DetalheContaCorrenteDto> alterarCartao(HttpServletRequest request, 
 									@RequestBody contaCorrenteAtualizacaoForm form) {
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Parceiro> optional = parceiroRepository.findById(id);
-		if(optional.isPresent()) {
-			ContaCorrente cartao = form.atualiza(optional.get(), contaCorrenteRepository);
-			return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Parceiro> optional = parceiroRepository.findById(id);
+			if(optional.isPresent()) {
+				ContaCorrente cartao = form.atualiza(optional.get(), contaCorrenteRepository);
+				return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}

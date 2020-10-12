@@ -57,59 +57,78 @@ public class ServicoClienteController {
 	@GetMapping("/agendados")
 	public List<ServicoDisponiveisDto> listarProximosServicos(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Cliente cliente = clienteRepository.getOne(id);
-		List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
-		return ServicoDisponiveisDto.converte(parceiros);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Cliente cliente = clienteRepository.getOne(id);
+			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
+			return ServicoDisponiveisDto.converte(parceiros);
+		}
+		return null;
 	}
 	
 	@GetMapping("/finalizados")
 	public List<ServicoDisponiveisDto> listarServicosConcluidos(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Cliente cliente = clienteRepository.getOne(id);
-		List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.FINALIZADO);
-		return ServicoDisponiveisDto.converte(parceiros);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Cliente cliente = clienteRepository.getOne(id);
+			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.FINALIZADO);
+			return ServicoDisponiveisDto.converte(parceiros);
+		}
+		return null;
 	}
 	
 	@GetMapping("detalhar/{id}")
- 	public ResponseEntity<ServicoDetalhadoParceiroDto> detalhar(@PathVariable Long id){
-		Optional<Servico> servico = servicoRepository.findById(id);
-		if(servico.isPresent()) {
-			return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico.get()));
+ 	public ResponseEntity<ServicoDetalhadoParceiroDto> detalhar(HttpServletRequest request, @PathVariable Long id){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Optional<Servico> servico = servicoRepository.findById(id);
+			if(servico.isPresent()) {
+				return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico.get()));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(@RequestBody FormNovoServico form){
-		Servico servico = FormNovoServico.converte(form, parceiroRepository, clienteRepository);
-		servicoRepository.save(servico);
-		
-		return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
+	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(HttpServletRequest request, @RequestBody FormNovoServico form){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Servico servico = FormNovoServico.converte(form, parceiroRepository, clienteRepository);
+			servicoRepository.save(servico);
+			
+			return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
+		}
+		return ResponseEntity.badRequest().build();
 	}
 	
 	@PutMapping("/cancelar/{id}")
 	@Transactional
-	public ResponseEntity<?> cancelar(@PathVariable Long id){
-		Optional<Servico> servico = servicoRepository.findById(id);
-		if(servico.isPresent()) {
-			servico.get().setStatus(StatusServico.CANCELADO);
-			return ResponseEntity.ok().build();
+	public ResponseEntity<?> cancelar(HttpServletRequest request, @PathVariable Long id){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Optional<Servico> servico = servicoRepository.findById(id);
+			if(servico.isPresent()) {
+				servico.get().setStatus(StatusServico.CANCELADO);
+				return ResponseEntity.ok().build();
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
 	
 	@PutMapping("/avaliar/{id}")
 	@Transactional
-	public ResponseEntity<?> avaliarServico(@PathVariable Long id, @RequestBody AvaliarServiçoParceiroForm form){
-		Optional<Servico> servico = servicoRepository.findById(id);
-		if(servico.isPresent()) {
-			form.avaliar(servico.get(), parceiroRepository, servicoRepository, comentarioRepository);
-			return ResponseEntity.ok().build();
+	public ResponseEntity<?> avaliarServico(HttpServletRequest request, @PathVariable Long id, @RequestBody AvaliarServiçoParceiroForm form){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Optional<Servico> servico = servicoRepository.findById(id);
+			if(servico.isPresent()) {
+				form.avaliar(servico.get(), parceiroRepository, servicoRepository, comentarioRepository);
+				return ResponseEntity.ok().build();
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}

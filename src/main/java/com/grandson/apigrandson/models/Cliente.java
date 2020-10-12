@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -34,8 +35,11 @@ public class Cliente implements UserDetails, Serializable{
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	private String nome;
+	@Column(unique = true)
 	private String email;
+	@Column(unique = true)
 	private String cpf;
+	@Column(unique = true)
 	private String telefone;
 	private LocalDateTime dataInicio = LocalDateTime.now();
 	private String senha;

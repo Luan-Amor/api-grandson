@@ -58,16 +58,23 @@ public class ClienteController {
 	private TokenService tokenService;
 	
 	@GetMapping("/home")
-	public List<ListaParceiroDto> listarParceiros(){
-		List<Parceiro> parceiros = parceiroRepository.findAll();
-		return ListaParceiroDto.converte(parceiros);
+	public List<ListaParceiroDto> listarParceiros(HttpServletRequest request){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			List<Parceiro> parceiros = parceiroRepository.findAll();
+			return ListaParceiroDto.converte(parceiros);			
+		}
+		return null;
 	}
 	
 	@GetMapping("/perfil/parceiro/{id}")
-	public ResponseEntity<PerfilParceiroDto> detalhar(@PathVariable Long id){
-		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
-		if(parceiro.isPresent()) {
-			return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
+	public ResponseEntity<PerfilParceiroDto> detalhar(HttpServletRequest request, @PathVariable Long id){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Optional<Parceiro> parceiro = parceiroRepository.findById(id);
+			if(parceiro.isPresent()) {
+				return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -75,11 +82,13 @@ public class ClienteController {
 	@GetMapping("/perfil")
 	public ResponseEntity<PerfilClienteDto> detalharCliente(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Cliente> cliente = clienteRespository.findById(id);
-		if(cliente.isPresent()) {
-			return ResponseEntity.ok(new PerfilClienteDto(cliente.get()));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> cliente = clienteRespository.findById(id);
+			if(cliente.isPresent()) {
+				return ResponseEntity.ok(new PerfilClienteDto(cliente.get()));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -87,13 +96,16 @@ public class ClienteController {
 	@GetMapping("/perfil/carteira")
 	public ResponseEntity<DetalheCartaoDeCreditoDto> detalharCartaoDeCredito(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
 		
-		Optional<Cliente> cliente = clienteRespository.findById(id);
-		if(cliente.isPresent()) {
-			Optional<CartaoDeCredito> cartao = cartaoDeCreditoRepository.findById(cliente.get().getCartao().getId());
-			if(cartao.isPresent()) {
-				return ResponseEntity.ok(new DetalheCartaoDeCreditoDto(cartao.get()));
+		if(tokenService.isTokenValido(token)) {			
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> cliente = clienteRespository.findById(id);
+			if(cliente.isPresent()) {
+				Optional<CartaoDeCredito> cartao = cartaoDeCreditoRepository.findById(cliente.get().getCartao().getId());
+				if(cartao.isPresent()) {
+					return ResponseEntity.ok(new DetalheCartaoDeCreditoDto(cartao.get()));
+				}
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -104,12 +116,15 @@ public class ClienteController {
 	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody @Valid ClienteForm form) {
 		
 		Cliente cliente = form.converter();
+		try {			
+			cartaoDeCreditoRepository.save(cliente.getCartao());
+			enderecoRepository.save(cliente.getEndereco());
+			clienteRespository.save(cliente);
+			return ResponseEntity.ok(new PerfilClienteDto(cliente));
+		}catch (Exception e) {
+			return ResponseEntity.badRequest().build();
+		}
 		
-		cartaoDeCreditoRepository.save(cliente.getCartao());
-		enderecoRepository.save(cliente.getEndereco());
-		clienteRespository.save(cliente);
-		
-		return ResponseEntity.ok(new PerfilClienteDto(cliente));
 	}
 	
 //	@DeleteMapping("/deletar")
@@ -131,12 +146,14 @@ public class ClienteController {
 	@Transactional
 	public ResponseEntity<PerfilClienteDto> alterar(HttpServletRequest request, @RequestBody ClienteAtualizacaoForm form) {
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Cliente> optional = clienteRespository.findById(id);
-		if(optional.isPresent()) {
-			Cliente cliente = form.atualiza(id, clienteRespository);
-			return ResponseEntity.ok(new PerfilClienteDto(cliente));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> optional = clienteRespository.findById(id);
+			if(optional.isPresent()) {
+				Cliente cliente = form.atualiza(id, clienteRespository);
+				return ResponseEntity.ok(new PerfilClienteDto(cliente));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -146,12 +163,14 @@ public class ClienteController {
 	public ResponseEntity<DetalheCartaoDeCreditoDto> alterarCartao(HttpServletRequest request, 
 									@RequestBody ClienteCartaoAtualizacaoForm form) {
 		String token = tokenService.recuperarToken(request);
-		Long id = tokenService.getIdUsuario(token);
-		
-		Optional<Cliente> optional = clienteRespository.findById(id);
-		if(optional.isPresent()) {
-			CartaoDeCredito cartao = form.atualiza(optional.get(), cartaoDeCreditoRepository);
-			return ResponseEntity.ok(new DetalheCartaoDeCreditoDto(cartao));
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> optional = clienteRespository.findById(id);
+			if(optional.isPresent()) {
+				CartaoDeCredito cartao = form.atualiza(optional.get(), cartaoDeCreditoRepository);
+				return ResponseEntity.ok(new DetalheCartaoDeCreditoDto(cartao));
+			}
 		}
 		return ResponseEntity.notFound().build();
 	}
