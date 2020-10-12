@@ -1,5 +1,7 @@
 package com.grandson.apigrandson.controller.cliente;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -67,17 +69,19 @@ public class ServicoClienteController {
 		return null;
 	}
 	
-	@GetMapping("/finalizados")
+	@GetMapping("/concluidos")
 	public List<ServicoDisponiveisDto> listarServicosConcluidos(HttpServletRequest request){
+		List<ServicoDisponiveisDto> convertido = new ArrayList<ServicoDisponiveisDto>();
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
-			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.FINALIZADO);
-			return ServicoDisponiveisDto.converte(parceiros);
+			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.CONCLUIDO);
+			convertido = ServicoDisponiveisDto.converte(parceiros);
+			return convertido;
 		}
-		return null;
+		return convertido;
 	}
 	
 	@GetMapping("detalhar/{id}")

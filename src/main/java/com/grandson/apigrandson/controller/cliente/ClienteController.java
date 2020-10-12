@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grandson.apigrandson.config.security.TokenService;
@@ -24,6 +25,8 @@ import com.grandson.apigrandson.controller.cliente.form.ClienteAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.ClienteCartaoAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.ClienteForm;
 import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
+import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
+import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ListaParceiroDto;
 import com.grandson.apigrandson.models.CartaoDeCredito;
@@ -173,6 +176,23 @@ public class ClienteController {
 			}
 		}
 		return ResponseEntity.notFound().build();
+	}
+	
+	@PutMapping("alterar/senha")
+	@Transactional
+	public ResponseEntity<MensagensDto> alterarSenha(HttpServletRequest request, @RequestBody AtualizarSenhaForm form){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> optional = clienteRespository.findById(id);
+			if(optional.isPresent()) {
+				String atualizarSenhaCliente = form.atualizarSenhaCliente(optional.get());
+				return ResponseEntity.ok(new MensagensDto(atualizarSenhaCliente));
+			}
+		}
+		
+		return ResponseEntity.badRequest().build();
 	}
 	
 	@PostMapping("/esquecisenha")

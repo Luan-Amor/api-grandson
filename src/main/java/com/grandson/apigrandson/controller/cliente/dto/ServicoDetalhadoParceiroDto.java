@@ -16,7 +16,7 @@ public class ServicoDetalhadoParceiroDto {
 	private String nota; 
 	private double valor;
 	private String telefone;
-	private int quantidadeHoras;
+	private double quantidadeHoras;
 	private String foto;
 	private String horario;
 	private String dia;

@@ -24,7 +24,9 @@ public class ServicoDisponiveisDto {
 		this.idParceiro = servico.getParceiro().getId();
 		this.nome = servico.getParceiro().getNome();
 		this.nota = servico.getParceiro().getNota();
-		this.foto = new FotoListaDto(servico.getParceiro().getFoto().getData());
+		
+		if(servico.getParceiro().getFoto() != null)
+			this.foto = new FotoListaDto(servico.getParceiro().getFoto().getData());
 	}
 
 	public static List<ServicoDisponiveisDto> converte(List<Servico> servicos) {

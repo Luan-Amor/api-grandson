@@ -25,7 +25,7 @@ public class Servico {
 	private Long id;
 	
 	private double valor;
-	private int quantidadeDeHoras;
+	private double quantidadeDeHoras;
 	private LocalDateTime horario;
 	private int avaliacaoCliente = 3;
 	private int avaliacaoParceiro = 3;

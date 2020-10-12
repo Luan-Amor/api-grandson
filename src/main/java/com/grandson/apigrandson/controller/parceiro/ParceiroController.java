@@ -25,6 +25,8 @@ import com.grandson.apigrandson.controller.cliente.dto.DetalheClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.ClienteCartaoAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
 import com.grandson.apigrandson.controller.cliente.form.LoginClienteForm;
+import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
+import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.DetalheContaCorrenteDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
@@ -189,6 +191,22 @@ public class ParceiroController{
 		return ResponseEntity.notFound().build();
 	}
 	
+	@PutMapping("alterar/senha")
+	@Transactional
+	public ResponseEntity<MensagensDto> alterarSenha(HttpServletRequest request, @RequestBody AtualizarSenhaForm form){
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Parceiro> optional = parceiroRepository.findById(id);
+			if(optional.isPresent()) {
+				String atualizarSenhaCliente = form.atualizarSenhaParceiro(optional.get());
+				return ResponseEntity.ok(new MensagensDto(atualizarSenhaCliente));
+			}
+		}
+		
+		return ResponseEntity.badRequest().build();
+	}
 	
 	@PostMapping("/esquecisenha")
 	public ResponseEntity<?> esqueciASenha(@RequestBody EsqueciASenhaForm email){

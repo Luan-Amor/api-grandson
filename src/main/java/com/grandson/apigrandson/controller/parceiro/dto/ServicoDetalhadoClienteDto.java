@@ -16,7 +16,7 @@ public class ServicoDetalhadoClienteDto {
 	private String nota; 
 	private double valor;
 	private String telefone;
-	private int quantidadeHoras;
+	private double quantidadeHoras;
 	private String horario;
 	private String dia;
 	private Foto foto;
@@ -35,7 +35,6 @@ public class ServicoDetalhadoClienteDto {
 		this.quantidadeHoras = servico.getQuantidadeDeHoras();
 		this.horario = servico.getHorario().format(DateTimeFormatter.ISO_LOCAL_TIME);
 		this.dia = servico.getHorario().format(DateTimeFormatter.ISO_DATE);
-		
 	}
 	
 }

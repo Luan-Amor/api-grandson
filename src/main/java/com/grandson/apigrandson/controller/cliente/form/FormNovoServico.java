@@ -14,7 +14,7 @@ import lombok.Getter;
 public class FormNovoServico {
 
 	private LocalDateTime horario;
-	private int quantidadeDeHoras;
+	private double quantidadeDeHoras;
 	private double valor;
 	private Long idCliente;
 	private Long idParceiro;
