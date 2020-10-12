@@ -155,7 +155,7 @@ public class ParceiroController{
 			
 			Optional<Parceiro> optional = parceiroRepository.findById(id);
 			if(optional.isPresent()) {
-				Parceiro parceiro = form.atualizar(id, parceiroRepository, enderecoRepository, fotoRepository);
+				Parceiro parceiro = form.atualizar(optional.get());
 				
 				return ResponseEntity.ok(new PerfilParceiroDto(parceiro));
 			}

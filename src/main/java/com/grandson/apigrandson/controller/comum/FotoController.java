@@ -8,10 +8,12 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -97,6 +99,53 @@ public class FotoController {
 		}
 		return ResponseEntity.badRequest().build();
 	}
+	
+	@PutMapping("/parceiro/{id}")
+	@Transactional
+	public ResponseEntity<FotoDetalheDto> alterarFotoParceiro(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
+		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+		
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Parceiro> optional = parceiroRepository.findById(id);
+			if(optional.isPresent()) {
+				if(optional.get().getFoto() == null)
+					fotoRepository.save(novaFoto);
+				else
+					optional.get().setFoto(novaFoto);
+				
+				return ResponseEntity.ok(new FotoDetalheDto(novaFoto));
+			}
+			
+		}
+		return ResponseEntity.badRequest().build();
+	}
+	
+	@PutMapping("/cliente/{id}")
+	@Transactional
+	public ResponseEntity<FotoDetalheDto> alterarFotoCliente(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
+		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+		
+		String token = tokenService.recuperarToken(request);
+		if(tokenService.isTokenValido(token)) {
+			Long id = tokenService.getIdUsuario(token);
+			
+			Optional<Cliente> optional = clienteRepository.findById(id);
+			if(optional.isPresent()) {
+				if(optional.get().getFoto() == null)
+					fotoRepository.save(novaFoto);
+				else
+					optional.get().setFoto(novaFoto);
+				return ResponseEntity.ok(new FotoDetalheDto(novaFoto));
+			}
+		}
+		return ResponseEntity.badRequest().build();
+	}
+	
 	
 	/*Métodos de teste*/
 	

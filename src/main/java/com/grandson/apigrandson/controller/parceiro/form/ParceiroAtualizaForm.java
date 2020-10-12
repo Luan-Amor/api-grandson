@@ -1,31 +1,13 @@
 package com.grandson.apigrandson.controller.parceiro.form;
 
-import java.time.LocalDateTime;
-import java.util.List;
-
-import javax.validation.constraints.NotEmpty;
-import javax.validation.constraints.NotNull;
-
-import com.grandson.apigrandson.models.Comentario;
-import com.grandson.apigrandson.models.Endereco;
-import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
-import com.grandson.apigrandson.repository.EnderecoRepository;
-import com.grandson.apigrandson.repository.FotoRepository;
-import com.grandson.apigrandson.repository.ParceiroRepository;
 
 import lombok.Getter;
 
 @Getter
 public class ParceiroAtualizaForm {
 
-	@NotNull @NotEmpty
 	private String nome;
-	@NotNull @NotEmpty
-	private String cpf;
-	@NotNull @NotEmpty
-	private String email;
-	@NotNull @NotEmpty
 	private String telefone;
 	
 	private String endereco;
@@ -34,20 +16,21 @@ public class ParceiroAtualizaForm {
 	private int numero;
 	
 	
-	public Parceiro atualizar(Long id, ParceiroRepository parceiroRepository, 
-			EnderecoRepository enderecoRepository, FotoRepository fotoRepository) {
+	public Parceiro atualizar(Parceiro parceiro) {
 		
-		Parceiro parceiro = parceiroRepository.getOne(id);
-		parceiro.setNome(nome);
-		parceiro.setTelefone(telefone);
-		parceiro.setCpf(cpf);
-		parceiro.setEmail(email);
+		if(nome != null && !nome.isEmpty())
+			parceiro.setNome(nome);
+		if(telefone != null && !telefone.isEmpty())
+			parceiro.setTelefone(telefone);
 		
-		Endereco endereco2 = enderecoRepository.getOne(parceiro.getEndereco().getId());
-		endereco2.setCep(cep);
-		endereco2.setEndereco(endereco);
-		endereco2.setNumero(numero);
-		endereco2.setComplemento(complemento);
+		if(cep != null && cep != 0)
+			parceiro.getEndereco().setCep(cep);
+		if(endereco != null && !endereco.isEmpty())
+			parceiro.getEndereco().setEndereco(endereco);
+		if(numero != 0)
+			parceiro.getEndereco().setNumero(numero);
+		if(complemento != null && !complemento.isEmpty())
+			parceiro.getEndereco().setComplemento(complemento);
 		
 		return parceiro;
 	}
