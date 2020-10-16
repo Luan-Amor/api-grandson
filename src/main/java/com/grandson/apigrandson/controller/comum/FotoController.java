@@ -44,7 +44,6 @@ public class FotoController {
 	@Autowired
 	private TokenService tokenService;
 	
-	
 	@PostMapping("/parceiro/{id}")
 	public ResponseEntity<FotoDetalheDto> salvarFotoParceiro(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
 		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());

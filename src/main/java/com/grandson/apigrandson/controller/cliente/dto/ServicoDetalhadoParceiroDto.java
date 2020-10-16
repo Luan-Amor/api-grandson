@@ -17,7 +17,7 @@ public class ServicoDetalhadoParceiroDto {
 	private double valor;
 	private String telefone;
 	private double quantidadeHoras;
-	private String foto;
+	private byte[] foto;
 	private String horario;
 	private String dia;
 	
@@ -28,7 +28,8 @@ public class ServicoDetalhadoParceiroDto {
 		this.nome = servico.getParceiro().getNome();
 		this.nota = servico.getParceiro().getNota();
 		this.telefone = servico.getParceiro().getTelefone();
-		this.foto = new String(servico.getParceiro().getFoto().getData());			
+		if(servico.getParceiro().getFoto() != null)
+			this.foto = servico.getParceiro().getFoto().getData();			
 		
 		this.idServico = servico.getId();
 		this.valor = servico.getValor();

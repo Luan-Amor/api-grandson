@@ -10,6 +10,7 @@ import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToMany;
+import javax.persistence.OneToMany;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -30,10 +31,12 @@ public class Administrador implements UserDetails{
 	private String senha;
 	
 //	private List<Servico> servicos;
-//	
-//	private List<Parceiro> parceiros;
-//	
-//	private List<Cliente> clientes;
+	
+	@OneToMany
+	private List<Parceiro> parceiros;
+	
+	@OneToMany
+	private List<Cliente> clientes;
 	
 	private double saldo;
 	
