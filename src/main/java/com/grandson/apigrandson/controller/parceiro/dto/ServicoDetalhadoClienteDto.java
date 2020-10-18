@@ -2,6 +2,7 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 
 import java.time.format.DateTimeFormatter;
 
+import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Servico;
 
@@ -20,8 +21,7 @@ public class ServicoDetalhadoClienteDto {
 	private String horario;
 	private String dia;
 	private Foto foto;
-	
-	public ServicoDetalhadoClienteDto() {}
+	private EnderecoDto endereco;
 	
 	public ServicoDetalhadoClienteDto(Servico servico) {
 		this.idCliente = servico.getCliente().getId();
@@ -35,6 +35,8 @@ public class ServicoDetalhadoClienteDto {
 		this.quantidadeHoras = servico.getQuantidadeDeHoras();
 		this.horario = servico.getHorario().format(DateTimeFormatter.ISO_LOCAL_TIME);
 		this.dia = servico.getHorario().format(DateTimeFormatter.ISO_DATE);
+		
+		this.endereco = new EnderecoDto(servico.getEndereco());
 	}
 	
 }

@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
 import com.grandson.apigrandson.models.Comentario;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
@@ -18,13 +19,13 @@ public class PerfilParceiroDto {
 	private String email;
 	private String telefone;
 	private String nota;
-	private String endereco;
 	private Foto foto;
-	private Long cep;
-	private String complemento;
-	private int numero;
+	
+	private EnderecoDto endereco;
+	
 	private LocalDateTime dataInicio;
 	private Long quantidadeServico;
+	
 	private List<Comentario> comentarios;
 	
 	public PerfilParceiroDto() {}
@@ -43,10 +44,7 @@ public class PerfilParceiroDto {
 		if(parceiro.getFoto() != null) 
 			this.foto = parceiro.getFoto();
 		
-		
-		this.endereco = parceiro.getEndereco().getEndereco();
-		this.cep = parceiro.getEndereco().getCep();
-		this.numero = parceiro.getEndereco().getNumero();
-		this.complemento = parceiro.getEndereco().getComplemento();
+		this.endereco = new EnderecoDto(parceiro.getEndereco());
+
 	}
 }

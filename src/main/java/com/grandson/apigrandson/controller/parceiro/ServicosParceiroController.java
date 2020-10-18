@@ -19,10 +19,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import com.grandson.apigrandson.Service.TransacaoService;
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ClienteListaDto;
 import com.grandson.apigrandson.controller.cliente.dto.ListaParceirosDisponiveisDto;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
+import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ListaParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDetalhadoClienteDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicosAgendadosDto;
@@ -34,6 +36,9 @@ import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ComentarioRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 import com.grandson.apigrandson.repository.ServicoRepository;
+
+import me.pagar.model.PagarMeException;
+import me.pagar.model.Transaction;
 
 @RestController
 @RequestMapping("api/parceiro/servico")
@@ -53,6 +58,9 @@ public class ServicosParceiroController {
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	@Autowired
+	private TransacaoService transacao;
 	
 	
 	@GetMapping("/agendados")
@@ -95,14 +103,13 @@ public class ServicosParceiroController {
 	
 	@PutMapping("/aceitar/{id}")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoClienteDto> aceitarServico(HttpServletRequest request, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<ServicoDetalhadoClienteDto> aceitarServico(HttpServletRequest request, @PathVariable Long id) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Optional<Servico> servico = servicoRepository.findById(id);
 			if(servico.isPresent()) {
 				servico.get().setStatus(StatusServico.ACEITO);
-				URI uri = uriBuilder.path("/detalhar/{id}").buildAndExpand(id).toUri();
-				return ResponseEntity.created(uri).body(new ServicoDetalhadoClienteDto(servico.get()));
+				return ResponseEntity.ok(new ServicoDetalhadoClienteDto(servico.get()));
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -110,13 +117,14 @@ public class ServicosParceiroController {
 	
 	@PutMapping("/cancelar/{id}")
 	@Transactional
-	public ResponseEntity<?> cancelar(HttpServletRequest request, @PathVariable Long id, UriComponentsBuilder uriBuilder) {
+	public ResponseEntity<MensagensDto> cancelar(HttpServletRequest request, @PathVariable Long id, UriComponentsBuilder uriBuilder) throws PagarMeException {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Optional<Servico> optional = servicoRepository.findById(id);
 			if(optional.isPresent()) {
 				optional.get().setStatus(StatusServico.CANCELADO);
-				return ResponseEntity.ok().build();
+				Transaction t = transacao.executarExtorno(optional.get());
+				return ResponseEntity.ok(new MensagensDto("Serviço cancelado com sucesso."));
 			}
 		}
 		return ResponseEntity.badRequest().build();

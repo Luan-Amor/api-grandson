@@ -11,6 +11,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.OneToOne;
 
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 
@@ -30,6 +31,7 @@ public class Servico {
 	private int avaliacaoCliente = 3;
 	private int avaliacaoParceiro = 3;
 	private LocalDateTime horarioDoPedido = LocalDateTime.now();
+	private int idtransacao;
 	
 	@Enumerated(EnumType.STRING)
 	private StatusServico status = StatusServico.PENDENTE;
@@ -39,13 +41,19 @@ public class Servico {
 	
 	@ManyToOne
 	private Parceiro parceiro;
+	
+	@OneToOne
+	private Endereco endereco;
 
 	public Servico() {}
 	
-	public Servico(FormNovoServico form) {
+	public Servico(FormNovoServico form, Cliente cliente2, Parceiro parceiro2, Endereco end) {
 		this.valor = (form.getValor());
 		this.quantidadeDeHoras = form.getQuantidadeDeHoras();
 		this.horario = form.getHorario();
+		this.cliente = cliente2;
+		this.parceiro = parceiro2;
+		this.endereco = end;
 	}
 	
 }

@@ -14,6 +14,8 @@ public class ClienteAtualizacaoForm {
 	private Long cep;
 	private String complemento;
 	private int numero;
+	private String cidade;
+	private String estado;
 	
 	public Cliente atualiza(Long id, ClienteRepository clienteRespository) {
 		Cliente cliente = clienteRespository.getOne(id);
@@ -30,6 +32,10 @@ public class ClienteAtualizacaoForm {
 			cliente.getEndereco().setComplemento(complemento);
 		if(numero != 0)
 			cliente.getEndereco().setNumero(numero);
+		if(estado != null) 
+			cliente.getEndereco().setEstado(estado);
+		if(cidade != null)
+			cliente.getEndereco().setCidade(cidade);
 		
 		return cliente;
 	}

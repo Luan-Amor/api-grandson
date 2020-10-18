@@ -40,6 +40,8 @@ public class ParceiroForm {
 	private String complemento;
 	private int numero;
 	private Long cep;
+	private String cidade;
+	private String estado;
 	
 	private int agencia;
 	private int conta;
@@ -50,7 +52,7 @@ public class ParceiroForm {
 		
 		String hash = GerarHashSenhaUtil.gerarHash(senha);
 		
-		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento);
+		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento, cidade, estado);
 		ContaCorrente cc = new ContaCorrente(agencia, conta, banco, tipo);
 		return new Parceiro(nome, email, cpf, telefone, hash, endereco, cc);
 	}

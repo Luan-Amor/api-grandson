@@ -23,7 +23,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
-		
+
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
 			<artifactId>jjwt</artifactId>
@@ -79,6 +79,11 @@
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 			<optional>true</optional>
+		</dependency>
+		<dependency>
+		    <groupId>me.pagar</groupId>
+		    <artifactId>pagarme-java</artifactId>
+		    <version>1.5.9</version>
 		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>

@@ -18,10 +18,12 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.grandson.apigrandson.Service.TransacaoService;
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
+import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Servico;
@@ -29,10 +31,15 @@ import com.grandson.apigrandson.models.StatusServico;
 import com.grandson.apigrandson.repository.AdministradorRepository;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ComentarioRepository;
+import com.grandson.apigrandson.repository.EnderecoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 import com.grandson.apigrandson.repository.ServicoRepository;
 
 import lombok.Getter;
+import me.pagar.model.PagarMeException;
+import me.pagar.model.Transaction;
+import me.pagar.model.Transaction.Status;
+
 
 @RestController
 @RequestMapping("api/cliente/servico")
@@ -48,13 +55,16 @@ public class ServicoClienteController {
 	private ServicoRepository servicoRepository;
 	
 	@Autowired
-	private AdministradorRepository administradorRepository;
-	
-	@Autowired
 	private ComentarioRepository comentarioRepository;
 	
 	@Autowired
+	private EnderecoRepository enderecoRepositoy;
+	
+	@Autowired
 	private TokenService tokenService;
+
+	@Autowired
+	private TransacaoService transacao;
 	
 	@GetMapping("/agendados")
 	public List<ServicoDisponiveisDto> listarProximosServicos(HttpServletRequest request){
@@ -98,26 +108,39 @@ public class ServicoClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(HttpServletRequest request, @RequestBody FormNovoServico form){
+	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(HttpServletRequest request, @RequestBody FormNovoServico form) throws PagarMeException{
 		String token = tokenService.recuperarToken(request);
-		if(tokenService.isTokenValido(token)) {
-			Servico servico = FormNovoServico.converte(form, parceiroRepository, clienteRepository);
-			servicoRepository.save(servico);
-			
-			return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
+		Long id = tokenService.getIdUsuario(token);
+		
+		if(tokenService.isTokenValido(token)){
+			Optional<Cliente> optional = clienteRepository.findById(id);
+			if(optional.isPresent()) {
+				Servico servico = FormNovoServico.converte(form, parceiroRepository, 
+						optional.get(), enderecoRepositoy);
+				if(servico != null) {
+					servicoRepository.save(servico);
+					Transaction t = transacao.executarTransacao(servico);
+					servico.setIdtransacao(t.getId());
+					if(t.getStatus() == Status.REFUSED) {
+						t.getRefuseReason();
+					}
+					return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
+				}
+			}
 		}
 		return ResponseEntity.badRequest().build();
 	}
 	
 	@PutMapping("/cancelar/{id}")
 	@Transactional
-	public ResponseEntity<?> cancelar(HttpServletRequest request, @PathVariable Long id){
+	public ResponseEntity<MensagensDto> cancelar(HttpServletRequest request, @PathVariable Long id) throws PagarMeException{
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Optional<Servico> servico = servicoRepository.findById(id);
 			if(servico.isPresent()) {
 				servico.get().setStatus(StatusServico.CANCELADO);
-				return ResponseEntity.ok().build();
+				Transaction t = transacao.executarExtorno(servico.get());
+				return ResponseEntity.ok(new MensagensDto("Serviço cancelado com sucesso."));
 			}
 		}
 		return ResponseEntity.notFound().build();

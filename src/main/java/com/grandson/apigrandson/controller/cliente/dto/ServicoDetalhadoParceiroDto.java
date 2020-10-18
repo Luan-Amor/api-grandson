@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.cliente.dto;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
 import com.grandson.apigrandson.models.Servico;
 
 import lombok.Getter;
@@ -20,6 +21,7 @@ public class ServicoDetalhadoParceiroDto {
 	private byte[] foto;
 	private String horario;
 	private String dia;
+	private EnderecoDto endereco;
 	
 	public ServicoDetalhadoParceiroDto() {}
 	
@@ -36,6 +38,8 @@ public class ServicoDetalhadoParceiroDto {
 		this.quantidadeHoras = servico.getQuantidadeDeHoras();
 		this.horario = servico.getHorario().format(DateTimeFormatter.ISO_LOCAL_TIME);
 		this.dia = servico.getHorario().format(DateTimeFormatter.ISO_DATE);
+		
+		this.endereco = new EnderecoDto(servico.getEndereco());
 		
 	}
 	

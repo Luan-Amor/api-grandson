@@ -47,6 +47,8 @@ public class ClienteForm {
 	private Long cep;
 	private int numero;
 	private String complemento;
+	private String cidade;
+	private String estado;
 	
 	private String nomeCartao;
 	
@@ -61,7 +63,7 @@ public class ClienteForm {
 		
 		String hash = GerarHashSenhaUtil.gerarHash(senha);
 		
-		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento);
+		Endereco endereco = new Endereco(cep, this.endereco, numero, complemento, cidade, estado);
 		CartaoDeCredito cartao = new CartaoDeCredito(nomeCartao, numeroCartao, cvv, data);
 		return new Cliente(this.nome, this.email, this.cpf, hash, telefone, endereco, cartao);
 	}
