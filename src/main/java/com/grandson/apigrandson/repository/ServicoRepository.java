@@ -37,7 +37,7 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
 	@Query("select AVG(s.avaliacaoCliente) from Servico s where s.cliente = :cliente")
 	public double getMediaAvaliacaoCliente(@Param("cliente") Cliente cliente);
 
-	@Query("select s from Servico s where s.horario <= :hoje and s.status != :status")
+	@Query("select s from Servico s where s.horario <= :hoje and s.status = :status")
 	public List<Servico> findAllServicosVencidos(@Param("hoje") LocalDateTime hoje,
 												@Param("status") StatusServico status);
 

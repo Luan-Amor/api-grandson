@@ -12,5 +12,7 @@ public interface ClienteRepository extends JpaRepository<Cliente, Long>{
 
 	public Optional<Cliente> findByEmail(String email);
 	
+	public Optional<Cliente> findByCpf(String cpf);
+	
 	
 }

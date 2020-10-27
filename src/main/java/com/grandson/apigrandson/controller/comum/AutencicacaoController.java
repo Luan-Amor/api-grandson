@@ -15,6 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.comum.dto.TokenDto;
 import com.grandson.apigrandson.controller.comum.form.LoginForm;
+import com.grandson.apigrandson.models.Cliente;
+import com.grandson.apigrandson.models.Parceiro;
+import com.grandson.apigrandson.repository.ParceiroRepository;
 
 @RestController
 @RequestMapping("api/")
@@ -32,7 +35,8 @@ public class AutencicacaoController {
 		try {
 			Authentication authentication = authManager.authenticate(dadosLogin);
 			String token = tokenService.gerarTokenParceiro(authentication);
-			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
+			Parceiro parceiro = (Parceiro) authentication.getPrincipal();
+			return ResponseEntity.ok(new TokenDto(token, "Bearer", parceiro.getNome()));
 		} catch (org.springframework.security.core.AuthenticationException e) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -44,7 +48,8 @@ public class AutencicacaoController {
 		try {
 			Authentication authentication = authManager.authenticate(dadosLogin);
 			String token = tokenService.gerarTokenCliente(authentication);
-			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
+			Cliente cliente = (Cliente) authentication.getPrincipal();
+			return ResponseEntity.ok(new TokenDto(token, "Bearer", cliente.getNome()));
 		} catch (org.springframework.security.core.AuthenticationException e) {
 			return ResponseEntity.badRequest().build();
 		}
@@ -56,7 +61,7 @@ public class AutencicacaoController {
 		try {
 			Authentication authentication = authManager.authenticate(dadosLogin);
 			String token = tokenService.gerarTokenAdm(authentication);
-			return ResponseEntity.ok(new TokenDto(token, "Bearer"));
+			return ResponseEntity.ok(new TokenDto(token, "Bearer", "ADM"));
 		} catch (org.springframework.security.core.AuthenticationException e) {
 			return ResponseEntity.badRequest().build();
 		}

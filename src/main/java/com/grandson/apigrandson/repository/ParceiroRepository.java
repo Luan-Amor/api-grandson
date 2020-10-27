@@ -9,5 +9,7 @@ import com.grandson.apigrandson.models.Parceiro;
 public interface ParceiroRepository extends JpaRepository<Parceiro, Long>{
 
 	public Optional<Parceiro> findByEmail(String email);
+	
+	public Optional<Parceiro> findByCpf(String cpf);
 
 }

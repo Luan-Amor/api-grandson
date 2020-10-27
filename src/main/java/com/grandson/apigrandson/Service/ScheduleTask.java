@@ -1,9 +1,7 @@
-package com.grandson.apigrandson.controller.comum;
+package com.grandson.apigrandson.Service;
 
 
-import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,7 +27,7 @@ public class ScheduleTask {
 		
 		try {
 			hoje = LocalDateTime.now();
-			List<Servico> servicosVencidos = servicos.findAllServicosVencidos(hoje, StatusServico.CONCLUIDO);
+			List<Servico> servicosVencidos = servicos.findAllServicosVencidos(hoje, StatusServico.ACEITO);
 			if(servicosVencidos.isEmpty()) {
 				System.out.println("Lista Vazia: " + hoje);
 			}else {

@@ -1,6 +1,5 @@
 package com.grandson.apigrandson.controller.parceiro;
 
-import java.net.URI;
 import java.util.List;
 import java.util.Optional;
 
@@ -9,7 +8,6 @@ import javax.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,14 +15,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import com.grandson.apigrandson.config.security.TokenService;
-import com.grandson.apigrandson.controller.cliente.dto.DetalheCartaoDeCreditoDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheClienteDto;
-import com.grandson.apigrandson.controller.cliente.form.ClienteCartaoAtualizacaoForm;
 import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
-import com.grandson.apigrandson.controller.cliente.form.LoginClienteForm;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
@@ -33,7 +27,6 @@ import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroAtualizaForm;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroForm;
 import com.grandson.apigrandson.controller.parceiro.form.contaCorrenteAtualizacaoForm;
-import com.grandson.apigrandson.models.CartaoDeCredito;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.ContaCorrente;
 import com.grandson.apigrandson.models.Parceiro;
@@ -42,7 +35,6 @@ import com.grandson.apigrandson.models.StatusServico;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ContaCorrenteRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
-import com.grandson.apigrandson.repository.FotoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 import com.grandson.apigrandson.repository.ServicoRepository;
 
@@ -64,9 +56,6 @@ public class ParceiroController{
 	
 	@Autowired 
 	private EnderecoRepository enderecoRepository;
-	
-	@Autowired
-	private FotoRepository fotoRepository;
 	
 	@Autowired
 	private TokenService tokenService;
@@ -113,15 +102,20 @@ public class ParceiroController{
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<?> cadastrar(@RequestBody ParceiroForm form){
-		try {
-			Parceiro parceiro = form.converter();
+	public ResponseEntity<MensagensDto> cadastrar(@RequestBody ParceiroForm form){
+		Parceiro parceiro = form.converter();
+		
+		if(parceiroRepository.findByEmail(form.getEmail()).isPresent())
+			return ResponseEntity.badRequest().body(new MensagensDto("O email informado já foi cadastrado."));
+		
+		if(parceiroRepository.findByCpf(form.getCpf()).isPresent())
+			return ResponseEntity.badRequest().body(new MensagensDto("O CPF informado já foi cadastrado."));
 			
+		try {
 			enderecoRepository.save(parceiro.getEndereco());
 			contaCorrenteRepository.save(parceiro.getConta());
-			parceiroRepository.save(parceiro);
-			
-			return ResponseEntity.ok().build();			
+			Parceiro save = parceiroRepository.save(parceiro);
+			return ResponseEntity.ok(new MensagensDto("Cadastros realizado com sucesso!", save.getId()));			
 		} catch (Exception e) {
 			System.err.println(e);
 		}
@@ -162,17 +156,6 @@ public class ParceiroController{
 		}
 		return ResponseEntity.notFound().build();
 	}
-	
-//	@DeleteMapping("/{id}")
-//	@Transactional
-//	public ResponseEntity<?> deletar(@PathVariable Long id){
-//		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
-//		if(parceiro.isPresent()) {
-//			parceiroRepository.deleteById(id);
-//			return ResponseEntity.ok().build();
-//		}
-//		return ResponseEntity.notFound().build();
-//	}
 	
 	@PutMapping("/perfil/carteira")
 	@Transactional

@@ -26,6 +26,7 @@ public class FormNovoServico {
 	private String complemento;  
 	private String cidade;
 	private String estado;
+	private String descricao;
 	
 	public static Servico converte(FormNovoServico form, ParceiroRepository parceiroRepository,
 			Cliente cliente, EnderecoRepository enderecoRepositoy) {

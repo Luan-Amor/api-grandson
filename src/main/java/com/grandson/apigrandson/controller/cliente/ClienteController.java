@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grandson.apigrandson.config.security.TokenService;
+import com.grandson.apigrandson.controller.cliente.dto.DetalharParceiroDto;
 import com.grandson.apigrandson.controller.cliente.dto.DetalheCartaoDeCreditoDto;
 import com.grandson.apigrandson.controller.cliente.dto.PerfilClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.ClienteAtualizacaoForm;
@@ -55,9 +56,6 @@ public class ClienteController {
 	private CartaoDeCreditoRepository cartaoDeCreditoRepository;
 	
 	@Autowired
-	private FotoRepository fotoRepository;
-	
-	@Autowired
 	private TokenService tokenService;
 	
 	@GetMapping("/home")
@@ -71,12 +69,12 @@ public class ClienteController {
 	}
 	
 	@GetMapping("/perfil/parceiro/{id}")
-	public ResponseEntity<PerfilParceiroDto> detalhar(HttpServletRequest request, @PathVariable Long id){
+	public ResponseEntity<DetalharParceiroDto> detalhar(HttpServletRequest request, @PathVariable Long id){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Optional<Parceiro> parceiro = parceiroRepository.findById(id);
 			if(parceiro.isPresent()) {
-				return ResponseEntity.ok(new PerfilParceiroDto(parceiro.get()));
+				return ResponseEntity.ok(new DetalharParceiroDto(parceiro.get()));
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -116,35 +114,27 @@ public class ClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<PerfilClienteDto> cadastrar(@RequestBody @Valid ClienteForm form) {
+	public ResponseEntity<MensagensDto> cadastrar(@RequestBody @Valid ClienteForm form) {
 		
 		Cliente cliente = form.converter();
+		if(clienteRespository.findByEmail(form.getEmail()).isPresent())
+			return ResponseEntity.badRequest().body(new MensagensDto("O email informado já foi cadastrado."));
+		
+		if(clienteRespository.findByCpf(form.getCpf()).isPresent())
+			return ResponseEntity.badRequest().body(new MensagensDto("O CPF informado já foi cadastrado."));
+		
 		try {			
 			cartaoDeCreditoRepository.save(cliente.getCartao());
 			enderecoRepository.save(cliente.getEndereco());
-			clienteRespository.save(cliente);
-			return ResponseEntity.ok(new PerfilClienteDto(cliente));
+			Cliente client = clienteRespository.save(cliente);
+			return ResponseEntity.ok(new MensagensDto("Cliente cadastrado com sucesso!", client.getId()));
 		}catch (Exception e) {
 			return ResponseEntity.badRequest().build();
 		}
 		
 	}
 	
-//	@DeleteMapping("/deletar")
-//	@Transactional
-//	public ResponseEntity<?> deletar(HttpServletRequest request) {
-//		String token = tokenService.recuperarToken(request);
-//		Long id = tokenService.getIdUsuario(token);
-//		
-//		Optional<Cliente> cliente = clienteRespository.findById(id);
-//		
-//		if(cliente.isPresent()) {
-//			clienteRespository.deleteById(id);
-//			return ResponseEntity.ok().build();
-//		}
-//		return ResponseEntity.notFound().build();
-//	}
-	
+
 	@PutMapping
 	@Transactional
 	public ResponseEntity<PerfilClienteDto> alterar(HttpServletRequest request, @RequestBody ClienteAtualizacaoForm form) {

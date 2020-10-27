@@ -45,33 +45,35 @@ public class FotoController {
 	private TokenService tokenService;
 	
 	@PostMapping("/parceiro/{id}")
+	@Transactional
 	public ResponseEntity<FotoDetalheDto> salvarFotoParceiro(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
-		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
-		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
 		
-		Foto save = fotoRepository.save(novaFoto);
 		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
 		if(parceiro.isPresent()) {
+			String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+			Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+			Foto save = fotoRepository.save(novaFoto);
 			parceiro.get().setFoto(save);
+			return ResponseEntity.ok(new FotoDetalheDto(save));
 		}
-		return ResponseEntity.ok(new FotoDetalheDto(save));
+		return ResponseEntity.badRequest().build();
 	}
 	
 	@PostMapping("/cliente/{id}")
-	public Foto salvarFotoCliente(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
-		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
-		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
-		
-		Foto save = fotoRepository.save(novaFoto);
+	@Transactional
+	public ResponseEntity<FotoDetalheDto> salvarFotoCliente(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
 		Optional<Cliente> cliente = clienteRepository.findById(id);
 		if(cliente.isPresent()) {
+			String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+			Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+			Foto save = fotoRepository.save(novaFoto);
 			cliente.get().setFoto(save);
+			return ResponseEntity.ok(new FotoDetalheDto(save));
 		}
-		
-		return fotoRepository.save(novaFoto);
+		return ResponseEntity.badRequest().build();
 	}
 	
-	@GetMapping("/cliente/{id}")
+	@GetMapping("/cliente")
 	public ResponseEntity<FotoDetalheDto> getFotoCliente(HttpServletRequest request) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
@@ -81,11 +83,11 @@ public class FotoController {
 				Foto foto = optional.get().getFoto();
 				return ResponseEntity.ok(new FotoDetalheDto(foto));
 			}
-			
 		}
 		return ResponseEntity.badRequest().build();
 	}
-	@GetMapping("/parceiro/{id}")
+	
+	@GetMapping("/parceiro")
 	public ResponseEntity<FotoDetalheDto> getFotoParceiro(HttpServletRequest request) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
@@ -99,76 +101,53 @@ public class FotoController {
 		return ResponseEntity.badRequest().build();
 	}
 	
-	@PutMapping("/parceiro/{id}")
+	@PutMapping("/parceiro")
 	@Transactional
-	public ResponseEntity<FotoDetalheDto> alterarFotoParceiro(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
-		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
-		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
-		
+	public ResponseEntity<FotoDetalheDto> alterarFotoParceiro(@RequestParam("file") MultipartFile foto, HttpServletRequest request) throws IOException {
 		String token = tokenService.recuperarToken(request);
-		if(tokenService.isTokenValido(token)) {
+		if(tokenService.isTokenValido(token)) {			
 			Long id = tokenService.getIdUsuario(token);
-			
 			Optional<Parceiro> optional = parceiroRepository.findById(id);
 			if(optional.isPresent()) {
-				if(optional.get().getFoto() == null)
-					fotoRepository.save(novaFoto);
-				else
-					optional.get().setFoto(novaFoto);
-				
+				String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+				Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+				if(optional.get().getFoto() == null) {
+					Foto save = fotoRepository.save(novaFoto);
+					optional.get().setFoto(save);
+				}else {
+					fotoRepository.delete(optional.get().getFoto());
+					Foto save = fotoRepository.save(novaFoto);
+					optional.get().setFoto(save);
+				}
 				return ResponseEntity.ok(new FotoDetalheDto(novaFoto));
 			}
-			
 		}
 		return ResponseEntity.badRequest().build();
 	}
 	
-	@PutMapping("/cliente/{id}")
+	@PutMapping("/cliente")
 	@Transactional
 	public ResponseEntity<FotoDetalheDto> alterarFotoCliente(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
-		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
-		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
 		
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
-			
 			Optional<Cliente> optional = clienteRepository.findById(id);
 			if(optional.isPresent()) {
-				if(optional.get().getFoto() == null)
-					fotoRepository.save(novaFoto);
-				else
-					optional.get().setFoto(novaFoto);
+				String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
+				Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
+				if(optional.get().getFoto() == null) {
+					Foto save = fotoRepository.save(novaFoto);
+					optional.get().setFoto(save);
+				}else {
+					fotoRepository.delete(optional.get().getFoto());
+					Foto save = fotoRepository.save(novaFoto);
+					optional.get().setFoto(save);
+				}
 				return ResponseEntity.ok(new FotoDetalheDto(novaFoto));
 			}
 		}
 		return ResponseEntity.badRequest().build();
-	}
-	
-	
-	/*Métodos de teste*/
-	
-	@PostMapping("/")
-	public ResponseEntity<FotoDetalheDto> salvar(@RequestParam("file") MultipartFile foto) throws IOException {
-		String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
-		Foto novaFoto = new Foto(nomeArquivo, foto.getContentType(), foto.getBytes());
-		
-		Foto save = fotoRepository.save(novaFoto);
-		return ResponseEntity.ok(new FotoDetalheDto(save));
-	}
-	
-	@GetMapping("/{id}")
-	public ResponseEntity<FotoDetalheDto> getFoto(@PathVariable Long id){ 
-		Optional<Foto> optional = fotoRepository.findById(id);
-		if(optional.isPresent()) {
-			return ResponseEntity.ok(new FotoDetalheDto(optional.get()));
-		}
-		return ResponseEntity.notFound().build();
-	}
-	
-	@GetMapping("/")
-	public Stream<Foto> allPhotos(){
-		return fotoRepository.findAll().stream();
 	}
 	
 }
