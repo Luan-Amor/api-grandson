@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 import org.springframework.util.Base64Utils;
 
 import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
-import com.grandson.apigrandson.controller.comum.dto.FotoListaDto;
+import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Foto;
 
@@ -21,7 +21,7 @@ public class PerfilClienteDto {
 	private String email;
 	private LocalDateTime dataInicio;
 	private String nota;
-	private FotoListaDto foto;
+	private FotoDto foto;
 	private EnderecoDto endereco;
 	
 	public PerfilClienteDto(Cliente cliente) {
@@ -35,7 +35,7 @@ public class PerfilClienteDto {
 		
 		if(cliente.getFoto() != null) {
 			cliente.getFoto();
-			this.foto = new FotoListaDto(cliente.getFoto().getData());
+			this.foto = new FotoDto(cliente.getFoto());
 		}
 			
 		this.endereco = new EnderecoDto(cliente.getEndereco());

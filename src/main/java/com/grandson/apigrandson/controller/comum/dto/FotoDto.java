@@ -5,15 +5,12 @@ import com.grandson.apigrandson.models.Foto;
 import lombok.Getter;
 
 @Getter
-public class FotoDetalheDto {
+public class FotoDto {
 
-	private String nome;
-	private String type;
+
 	private byte[] data;
 	
-	public FotoDetalheDto(Foto foto){
-		this.nome = foto.getNome();
-		this.type = foto.getType();
+	public FotoDto(Foto foto){
 		this.data = foto.getData();
 	}
 	

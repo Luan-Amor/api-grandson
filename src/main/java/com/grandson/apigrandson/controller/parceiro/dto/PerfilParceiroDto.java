@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 
 import com.grandson.apigrandson.controller.comum.dto.ComentarioDto;
 import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
-import com.grandson.apigrandson.controller.comum.dto.FotoDetalheDto;
+import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Parceiro;
 
 import lombok.Getter;
@@ -21,7 +21,7 @@ public class PerfilParceiroDto {
 	private String email;
 	private String telefone;
 	private String nota;
-	private FotoDetalheDto foto = null;
+	private FotoDto foto = null;
 	
 	private EnderecoDto endereco;
 	
@@ -43,7 +43,7 @@ public class PerfilParceiroDto {
 		this.dataInicio = parceiro.getDataInicio();
 		
 		if(parceiro.getFoto() != null) 
-			this.foto = new FotoDetalheDto(parceiro.getFoto());
+			this.foto = new FotoDto(parceiro.getFoto());
 			
 		if(!parceiro.getComentarios().isEmpty())
 			this.comentarios.addAll(parceiro.getComentarios().stream().map(ComentarioDto::new).collect(Collectors.toList()));
