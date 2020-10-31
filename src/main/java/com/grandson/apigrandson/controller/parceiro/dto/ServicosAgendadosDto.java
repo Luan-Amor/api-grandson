@@ -1,6 +1,5 @@
 package com.grandson.apigrandson.controller.parceiro.dto;
 
-import java.util.Base64;
 import java.util.List;
 import java.util.stream.Collectors;
 

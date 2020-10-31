@@ -1,18 +1,16 @@
 package com.grandson.apigrandson.controller.parceiro;
 
-import java.net.URI;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.websocket.server.PathParam;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,14 +19,11 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import com.grandson.apigrandson.Service.TransacaoService;
 import com.grandson.apigrandson.config.security.TokenService;
-import com.grandson.apigrandson.controller.cliente.dto.ClienteListaDto;
-import com.grandson.apigrandson.controller.cliente.dto.ListaParceirosDisponiveisDto;
-import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
-import com.grandson.apigrandson.controller.parceiro.dto.ListaParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDetalhadoClienteDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicosAgendadosDto;
 import com.grandson.apigrandson.controller.parceiro.form.AvaliarClienteForm;
+import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Parceiro;
 import com.grandson.apigrandson.models.Servico;
 import com.grandson.apigrandson.models.StatusServico;
@@ -73,7 +68,7 @@ public class ServicosParceiroController {
 			List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.ACEITO);
 			return ServicosAgendadosDto.converte(clientes);
 		}
-		return null; 
+		return new ArrayList<ServicosAgendadosDto>(); 
 	}
 	
 	@GetMapping("/concluidos")
@@ -86,7 +81,7 @@ public class ServicosParceiroController {
 			List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.AVALIADO, StatusServico.CONCLUIDO);
 			return ServicosAgendadosDto.converte(clientes);
 		}
-		return null;
+		return new ArrayList<ServicosAgendadosDto>();
 	}
 	
 	@GetMapping("/detalhar/{id}")
@@ -101,15 +96,17 @@ public class ServicosParceiroController {
 		return ResponseEntity.notFound().build();
 	}
 	
-	@PutMapping("/aceitar/{id}")
+	@PutMapping("/aceitar/{idservico}")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoClienteDto> aceitarServico(HttpServletRequest request, @PathVariable Long id) {
+	public ResponseEntity<MensagensDto> aceitarServico(HttpServletRequest request, @PathVariable Long idservico) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
-			Optional<Servico> servico = servicoRepository.findById(id);
+			Optional<Servico> servico = servicoRepository.findById(idservico);
 			if(servico.isPresent()) {
+				Cliente cliente = (Cliente) servico.get().getCliente();
+				cliente.setQuantidadeServicos(cliente.getQuantidadeServicos() + 1);
 				servico.get().setStatus(StatusServico.ACEITO);
-				return ResponseEntity.ok(new ServicoDetalhadoClienteDto(servico.get()));
+				return ResponseEntity.ok(new MensagensDto("Serviço aceito."));
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -143,9 +140,9 @@ public class ServicosParceiroController {
 				} catch (Exception e) {
 					System.out.println(e);
 				}
-				return ResponseEntity.ok().build();
+				return ResponseEntity.ok(new MensagensDto("Obrigado! O serviço foi com sucesso."));
 			}
 		}
-		return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Não foi possível realizar a avaliação."));
 	}
 }

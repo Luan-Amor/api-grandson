@@ -108,7 +108,7 @@ public class ServicoClienteController {
 	
 	@PostMapping("/cadastrar")
 	@Transactional
-	public ResponseEntity<ServicoDetalhadoParceiroDto> cadastrar(HttpServletRequest request, @RequestBody FormNovoServico form) throws PagarMeException{
+	public ResponseEntity<MensagensDto> cadastrar(HttpServletRequest request, @RequestBody FormNovoServico form) throws PagarMeException{
 		String token = tokenService.recuperarToken(request);
 		Long id = tokenService.getIdUsuario(token);
 		
@@ -124,11 +124,11 @@ public class ServicoClienteController {
 					if(t.getStatus() == Status.REFUSED) {
 						t.getRefuseReason();
 					}
-					return ResponseEntity.ok(new ServicoDetalhadoParceiroDto(servico));
+					return ResponseEntity.ok(new MensagensDto("Serviço cadastrado com sucesso.", servico.getId()));
 				}
 			}
 		}
-		return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Erro ao cadastrar o serviço."));
 	}
 	
 	@PutMapping("/cancelar/{id}")
@@ -143,7 +143,7 @@ public class ServicoClienteController {
 				return ResponseEntity.ok(new MensagensDto("Serviço cancelado com sucesso."));
 			}
 		}
-		return ResponseEntity.notFound().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Falha ao cancelar o serviço."));
 	}
 	
 	@PutMapping("/avaliar/{id}")
@@ -154,7 +154,7 @@ public class ServicoClienteController {
 			Optional<Servico> servico = servicoRepository.findById(id);
 			if(servico.isPresent()) {
 				form.avaliar(servico.get(), parceiroRepository, servicoRepository, comentarioRepository);
-				return ResponseEntity.ok().build();
+				return ResponseEntity.ok(new MensagensDto("Obrigado! O serviço foi avaliado com sucesso."));
 			}
 		}
 		return ResponseEntity.notFound().build();

@@ -7,11 +7,11 @@ import lombok.Getter;
 @Getter
 public class FotoDto {
 
-
 	private byte[] data;
 	
 	public FotoDto(Foto foto){
-		this.data = foto.getData();
+		if(foto != null) {			
+			this.data = foto.getData();
+		}
 	}
-	
 }

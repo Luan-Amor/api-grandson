@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 import java.time.format.DateTimeFormatter;
 
 import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
+import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Servico;
 
@@ -12,23 +13,24 @@ import lombok.Getter;
 public class ServicoDetalhadoClienteDto {
 
 	private Long idCliente;
-	private Long idServico;
 	private String nome;
 	private String nota; 
-	private double valor;
 	private String telefone;
+	private FotoDto foto;
+	private EnderecoDto endereco;
+	
+	private Long idServico;
 	private double quantidadeHoras;
+	private double valor;
 	private String horario;
 	private String dia;
-	private Foto foto;
-	private EnderecoDto endereco;
 	
 	public ServicoDetalhadoClienteDto(Servico servico) {
 		this.idCliente = servico.getCliente().getId();
 		this.nome = servico.getCliente().getNome();
 		this.nota = servico.getCliente().getNota();
 		this.telefone = servico.getCliente().getTelefone();
-		this.foto = servico.getCliente().getFoto();
+		this.foto = new FotoDto(servico.getCliente().getFoto());
 		
 		this.idServico = servico.getId();
 		this.valor = (servico.getValor() / 2);

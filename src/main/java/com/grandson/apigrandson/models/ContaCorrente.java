@@ -15,12 +15,14 @@ public class ContaCorrente {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	private String nomeBenecifiario;
 	private int agencia;
 	private int conta;
 	private String banco;
 	private String tipo;
 	
-	public ContaCorrente(int agencia, int conta, String banco, String tipo) {
+	public ContaCorrente(int agencia, int conta, String banco, String tipo, String nome) {
+		this.nomeBenecifiario = nome;
 		this.agencia = agencia;
 		this.conta = conta;
 		this.banco = banco;

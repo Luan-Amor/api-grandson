@@ -1,5 +1,6 @@
 package com.grandson.apigrandson.controller.cliente;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.grandson.apigrandson.config.security.TokenService;
@@ -28,7 +28,6 @@ import com.grandson.apigrandson.controller.cliente.form.ClienteForm;
 import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
-import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ListaParceiroDto;
 import com.grandson.apigrandson.models.CartaoDeCredito;
 import com.grandson.apigrandson.models.Cliente;
@@ -36,7 +35,6 @@ import com.grandson.apigrandson.models.Parceiro;
 import com.grandson.apigrandson.repository.CartaoDeCreditoRepository;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
-import com.grandson.apigrandson.repository.FotoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 
 @RestController
@@ -65,7 +63,7 @@ public class ClienteController {
 			List<Parceiro> parceiros = parceiroRepository.findAll();
 			return ListaParceiroDto.converte(parceiros);			
 		}
-		return null;
+		return new ArrayList<ListaParceiroDto>();
 	}
 	
 	@GetMapping("/perfil/parceiro/{id}")
@@ -153,7 +151,7 @@ public class ClienteController {
 	
 	@PutMapping("/carteira")
 	@Transactional
-	public ResponseEntity<DetalheCartaoDeCreditoDto> alterarCartao(HttpServletRequest request, 
+	public ResponseEntity<?> alterarCartao(HttpServletRequest request, 
 									@RequestBody ClienteCartaoAtualizacaoForm form) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
@@ -161,8 +159,8 @@ public class ClienteController {
 			
 			Optional<Cliente> optional = clienteRespository.findById(id);
 			if(optional.isPresent()) {
-				CartaoDeCredito cartao = form.atualiza(optional.get(), cartaoDeCreditoRepository);
-				return ResponseEntity.ok(new DetalheCartaoDeCreditoDto(cartao));
+				form.atualiza(optional.get(), cartaoDeCreditoRepository);
+				return ResponseEntity.ok(new MensagensDto("Cartão alterado com sucesso."));
 			}
 		}
 		return ResponseEntity.notFound().build();

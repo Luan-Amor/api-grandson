@@ -1,5 +1,6 @@
 package com.grandson.apigrandson.controller.parceiro;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -65,12 +66,11 @@ public class ParceiroController{
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
-			
 			Parceiro parceiro = parceiroRepository.getOne(id);
 			List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
 			return ServicoDisponiveisDto.converte(servicos);
 		}
-		return null;
+		return new ArrayList<ServicoDisponiveisDto>();
 	}
 	
 	@GetMapping("/perfil")
@@ -142,24 +142,23 @@ public class ParceiroController{
 	
 	@PutMapping
 	@Transactional
-	public ResponseEntity<PerfilParceiroDto> alterar(@RequestBody ParceiroAtualizaForm form, HttpServletRequest request){
+	public ResponseEntity<MensagensDto> alterar(@RequestBody ParceiroAtualizaForm form, HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Optional<Parceiro> optional = parceiroRepository.findById(id);
 			if(optional.isPresent()) {
-				Parceiro parceiro = form.atualizar(optional.get());
-				
-				return ResponseEntity.ok(new PerfilParceiroDto(parceiro));
+				form.atualizar(optional.get());
+				return ResponseEntity.ok(new MensagensDto("Os dados foram alterados com sucesso."));
 			}
 		}
-		return ResponseEntity.notFound().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Falha ao tentar alterar os dados."));
 	}
 	
 	@PutMapping("/perfil/carteira")
 	@Transactional
-	public ResponseEntity<DetalheContaCorrenteDto> alterarCartao(HttpServletRequest request, 
+	public ResponseEntity<MensagensDto> alterarCartao(HttpServletRequest request, 
 									@RequestBody contaCorrenteAtualizacaoForm form) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
@@ -167,8 +166,8 @@ public class ParceiroController{
 			
 			Optional<Parceiro> optional = parceiroRepository.findById(id);
 			if(optional.isPresent()) {
-				ContaCorrente cartao = form.atualiza(optional.get(), contaCorrenteRepository);
-				return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao));
+				form.atualiza(optional.get(), contaCorrenteRepository);
+				return ResponseEntity.ok(new MensagensDto("Cartão alterado com sucesso."));
 			}
 		}
 		return ResponseEntity.notFound().build();
@@ -183,12 +182,12 @@ public class ParceiroController{
 			
 			Optional<Parceiro> optional = parceiroRepository.findById(id);
 			if(optional.isPresent()) {
-				String atualizarSenhaCliente = form.atualizarSenhaParceiro(optional.get());
-				return ResponseEntity.ok(new MensagensDto(atualizarSenhaCliente));
+				form.atualizarSenhaParceiro(optional.get());
+				return ResponseEntity.ok(new MensagensDto("Senha alterada com sucesso."));
 			}
 		}
 		
-		return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Falha ao tentar alterar a senha."));
 	}
 	
 	@PostMapping("/esquecisenha")

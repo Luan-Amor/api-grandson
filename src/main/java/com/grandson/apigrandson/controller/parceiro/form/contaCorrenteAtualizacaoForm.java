@@ -6,6 +6,7 @@ import com.grandson.apigrandson.repository.ContaCorrenteRepository;
 
 public class contaCorrenteAtualizacaoForm {
 
+	private String nome;
 	private int agencia;
 	private int conta;
 	private String banco;
@@ -14,6 +15,7 @@ public class contaCorrenteAtualizacaoForm {
 	public ContaCorrente atualiza(Parceiro parceiro, ContaCorrenteRepository contaCorrenteRepository) {
 		try {
 			ContaCorrente contaCorrente = contaCorrenteRepository.getOne(parceiro.getId());
+			contaCorrente.setNomeBenecifiario(nome);
 			contaCorrente.setAgencia(agencia);
 			contaCorrente.setConta(conta);
 			contaCorrente.setBanco(banco);

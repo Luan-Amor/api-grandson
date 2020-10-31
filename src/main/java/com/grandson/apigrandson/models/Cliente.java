@@ -44,6 +44,7 @@ public class Cliente implements UserDetails, Serializable{
 	private LocalDateTime dataInicio = LocalDateTime.now();
 	private String senha;
 	private String nota = "3";
+	private Long quantidadeServicos = 0l;
 	
 //	@ManyToMany(fetch = FetchType.LAZY)
 //	private List<Perfil> perfis = new ArrayList<>();

@@ -23,6 +23,7 @@ public class PerfilClienteDto {
 	private String nota;
 	private FotoDto foto;
 	private EnderecoDto endereco;
+	private Long quantidadeServicos;
 	
 	public PerfilClienteDto(Cliente cliente) {
 		this.id = cliente.getId();
@@ -32,6 +33,7 @@ public class PerfilClienteDto {
 		this.email = cliente.getEmail();
 		this.dataInicio = cliente.getDataInicio();
 		this.nota = cliente.getNota();
+		this.quantidadeServicos = cliente.getQuantidadeServicos();
 		
 		if(cliente.getFoto() != null) {
 			cliente.getFoto();
