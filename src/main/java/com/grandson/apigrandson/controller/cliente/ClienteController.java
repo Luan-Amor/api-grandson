@@ -125,7 +125,7 @@ public class ClienteController {
 			cartaoDeCreditoRepository.save(cliente.getCartao());
 			enderecoRepository.save(cliente.getEndereco());
 			Cliente client = clienteRespository.save(cliente);
-			return ResponseEntity.ok(new MensagensDto("Cliente cadastrado com sucesso!", client.getId()));
+			return ResponseEntity.ok(new MensagensDto("Cliente cadastrado com sucesso!", client.getId()) );
 		}catch (Exception e) {
 			return ResponseEntity.badRequest().build();
 		}

@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Servico;
 
@@ -15,7 +16,7 @@ public class ServicosAgendadosDto {
 	private Long idCliente;
 	private String nota;
 	private String nome;
-	private Foto foto;
+	private FotoDto foto;
 	
 	
 	public ServicosAgendadosDto(Servico servico) {
@@ -24,7 +25,7 @@ public class ServicosAgendadosDto {
 		this.idCliente = servico.getCliente().getId();
 		this.nota = servico.getCliente().getNota();
 		this.nome = servico.getCliente().getNome();
-		this.foto = servico.getCliente().getFoto();
+		this.foto = new FotoDto(servico.getCliente().getFoto());
 	}
 
 	public static List<ServicosAgendadosDto> converte(List<Servico> clientes) {

@@ -24,7 +24,7 @@ import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroD
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
-import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
+import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Servico;
 import com.grandson.apigrandson.models.StatusServico;
@@ -67,28 +67,28 @@ public class ServicoClienteController {
 	private TransacaoService transacao;
 	
 	@GetMapping("/agendados")
-	public List<ServicoDisponiveisDto> listarProximosServicos(HttpServletRequest request){
+	public List<ServicoDisponiveisParceiroDto> listarProximosServicos(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
 			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
-			return ServicoDisponiveisDto.converte(parceiros);
+			return ServicoDisponiveisParceiroDto.converte(parceiros);
 		}
 		return null;
 	}
 	
 	@GetMapping("/concluidos")
-	public List<ServicoDisponiveisDto> listarServicosConcluidos(HttpServletRequest request){
-		List<ServicoDisponiveisDto> convertido = new ArrayList<ServicoDisponiveisDto>();
+	public List<ServicoDisponiveisParceiroDto> listarServicosConcluidos(HttpServletRequest request){
+		List<ServicoDisponiveisParceiroDto> convertido = new ArrayList<ServicoDisponiveisParceiroDto>();
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
 			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.CONCLUIDO);
-			convertido = ServicoDisponiveisDto.converte(parceiros);
+			convertido = ServicoDisponiveisParceiroDto.converte(parceiros);
 			return convertido;
 		}
 		return convertido;

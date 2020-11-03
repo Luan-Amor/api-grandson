@@ -5,14 +5,14 @@ import lombok.Getter;
 @Getter
 public class MensagensDto {
 
-	private Object object;
+	private Long object;
 	private String mensagem;
 	
 	public MensagensDto(String mensagem){
 		this.mensagem = mensagem;
 	}
 	
-	public MensagensDto(String mensagem, Object object){
+	public MensagensDto(String mensagem, Long object){
 		this.object = object;
 		this.mensagem = mensagem;
 	}

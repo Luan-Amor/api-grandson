@@ -3,6 +3,7 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
 
@@ -12,7 +13,7 @@ import lombok.Getter;
 public class ListaParceiroDto {
 	
 	private Long id;
-	private Foto foto;
+	private FotoDto foto;
 	private String nome;
 	private String nota;
 	
@@ -22,8 +23,7 @@ public class ListaParceiroDto {
 		this.id = parceiro.getId();
 		this.nome = parceiro.getNome();
 		this.nota = parceiro.getNota();
-		if(parceiro.getFoto() != null)
-			this.foto = parceiro.getFoto();
+		this.foto = new FotoDto(parceiro.getFoto());
 	}
 
 	public static List<ListaParceiroDto> converte(List<Parceiro> parceiro) {

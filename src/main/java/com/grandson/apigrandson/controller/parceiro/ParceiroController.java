@@ -24,7 +24,7 @@ import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.dto.DetalheContaCorrenteDto;
-import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisDto;
+import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroAtualizaForm;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroForm;
 import com.grandson.apigrandson.controller.parceiro.form.contaCorrenteAtualizacaoForm;
@@ -62,15 +62,15 @@ public class ParceiroController{
 	private TokenService tokenService;
 	
 	@GetMapping("/home")
-	public List<ServicoDisponiveisDto> servicosDisponiveis(HttpServletRequest request){
+	public List<ServicoDisponiveisParceiroDto> servicosDisponiveis(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			Parceiro parceiro = parceiroRepository.getOne(id);
 			List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
-			return ServicoDisponiveisDto.converte(servicos);
+			return ServicoDisponiveisParceiroDto.converte(servicos);
 		}
-		return new ArrayList<ServicoDisponiveisDto>();
+		return new ArrayList<ServicoDisponiveisParceiroDto>();
 	}
 	
 	@GetMapping("/perfil")
