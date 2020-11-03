@@ -21,6 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.comum.dto.FotoDto;
+import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Parceiro;
@@ -46,7 +47,7 @@ public class FotoController {
 	
 	@PostMapping("/parceiro/{id}")
 	@Transactional
-	public ResponseEntity<FotoDto> salvarFotoParceiro(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
+	public ResponseEntity<FotoDto> salvarFotoParceiro(@RequestParam MultipartFile foto, @PathVariable Long id) throws IOException {
 		
 		Optional<Parceiro> parceiro = parceiroRepository.findById(id);
 		if(parceiro.isPresent()) {
@@ -61,7 +62,7 @@ public class FotoController {
 	
 	@PostMapping("/cliente/{id}")
 	@Transactional
-	public ResponseEntity<FotoDto> salvarFotoCliente(@RequestParam("file") MultipartFile foto, @PathVariable Long id) throws IOException {
+	public ResponseEntity<FotoDto> salvarFotoCliente(@RequestParam MultipartFile foto, @PathVariable Long id) throws IOException {
 		Optional<Cliente> cliente = clienteRepository.findById(id);
 		if(cliente.isPresent()) {
 			String nomeArquivo = StringUtils.cleanPath(foto.getOriginalFilename());
@@ -103,7 +104,7 @@ public class FotoController {
 	
 	@PutMapping("/parceiro")
 	@Transactional
-	public ResponseEntity<FotoDto> alterarFotoParceiro(@RequestParam("file") MultipartFile foto, HttpServletRequest request) throws IOException {
+	public ResponseEntity<?> alterarFotoParceiro(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {			
 			Long id = tokenService.getIdUsuario(token);
@@ -122,7 +123,7 @@ public class FotoController {
 				return ResponseEntity.ok(new FotoDto(novaFoto));
 			}
 		}
-		return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Não foi possível carregar a foto."));
 	}
 	
 	@PutMapping("/cliente")
