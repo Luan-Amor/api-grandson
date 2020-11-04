@@ -14,7 +14,7 @@ public class ComentariosParceiroDto {
 	
 	public ComentariosParceiroDto(Comentario comentario){
 			this.nome = comentario.getParceiro().getNome();
-			this.texto = comentario.getComentarioParceiro();
+			this.texto = comentario.getComentarioCliente();
 			this.foto = new FotoDto(comentario.getParceiro().getFoto());
 	}
 	
