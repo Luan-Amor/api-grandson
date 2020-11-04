@@ -12,9 +12,9 @@ public class ComentarioDto {
 	private String texto;
 	
 	public ComentarioDto(Comentario comentario){
-			this.nome = comentario.getParceiro().getNome();
-			this.texto = comentario.getComentarioParceiro();
-			this.foto = new FotoDto(comentario.getParceiro().getFoto());
+			this.nome = comentario.getCliente().getNome();
+			this.texto = comentario.getComentarioCliente();
+			this.foto = new FotoDto(comentario.getCliente().getFoto());
 		
 	}
 	
