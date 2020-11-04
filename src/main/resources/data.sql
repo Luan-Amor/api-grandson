@@ -11,9 +11,9 @@ insert into cartao_de_credito(nome_do_cartao, numero_do_cartao, codigo_de_segura
 values('Cliente da silva','5448280000000007', 123, '2021-01-01');
 
 --CLIENTES
-insert into Cliente(nome, email, cpf, nota,data_inicio, senha, endereco_id, cartao_id, telefone) 
+insert into Cliente(nome, email, cpf, nota,data_inicio, senha, endereco_id, cartao_id, telefone, quantidade_servicos) 
 values('Cliente', 'cliente@email.com', '53430661196', 3, '2020-09-01 18:00:00',
-	'$2a$10$6pnrDy54qqVtPV4BYbTd4Or.ES0V0Bx05QBW/NZK7oui3kPreZFqW', 2, 1, '61982111111');
+	'$2a$10$6pnrDy54qqVtPV4BYbTd4Or.ES0V0Bx05QBW/NZK7oui3kPreZFqW', 2, 1, '61982111111', 2l);
 	
 --PARCEIROS
 insert into Parceiro(nome, email, cpf, telefone, saldo, nota, senha, quantidade_servicos,

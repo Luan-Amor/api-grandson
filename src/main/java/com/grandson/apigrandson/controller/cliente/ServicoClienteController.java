@@ -1,7 +1,6 @@
 package com.grandson.apigrandson.controller.cliente;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -21,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.grandson.apigrandson.Service.TransacaoService;
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
+import com.grandson.apigrandson.controller.cliente.dto.ServicosConcluidosClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
@@ -28,14 +28,12 @@ import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParcei
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Servico;
 import com.grandson.apigrandson.models.StatusServico;
-import com.grandson.apigrandson.repository.AdministradorRepository;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ComentarioRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
 import com.grandson.apigrandson.repository.ParceiroRepository;
 import com.grandson.apigrandson.repository.ServicoRepository;
 
-import lombok.Getter;
 import me.pagar.model.PagarMeException;
 import me.pagar.model.Transaction;
 import me.pagar.model.Transaction.Status;
@@ -80,15 +78,15 @@ public class ServicoClienteController {
 	}
 	
 	@GetMapping("/concluidos")
-	public List<ServicoDisponiveisParceiroDto> listarServicosConcluidos(HttpServletRequest request){
-		List<ServicoDisponiveisParceiroDto> convertido = new ArrayList<ServicoDisponiveisParceiroDto>();
+	public List<ServicosConcluidosClienteDto> listarServicosConcluidos(HttpServletRequest request){
+		List<ServicosConcluidosClienteDto> convertido = new ArrayList<ServicosConcluidosClienteDto>();
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
 			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.CONCLUIDO);
-			convertido = ServicoDisponiveisParceiroDto.converte(parceiros);
+			convertido = ServicosConcluidosClienteDto.converte(parceiros);
 			return convertido;
 		}
 		return convertido;

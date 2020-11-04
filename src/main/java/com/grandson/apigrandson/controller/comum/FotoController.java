@@ -128,7 +128,7 @@ public class FotoController {
 	
 	@PutMapping("/cliente")
 	@Transactional
-	public ResponseEntity<FotoDto> alterarFotoCliente(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
+	public ResponseEntity<?> alterarFotoCliente(@RequestParam MultipartFile foto, HttpServletRequest request) throws IOException {
 		
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
@@ -148,7 +148,7 @@ public class FotoController {
 				return ResponseEntity.ok(new FotoDto(novaFoto));
 			}
 		}
-		return ResponseEntity.badRequest().build();
+		return ResponseEntity.badRequest().body(new MensagensDto("Não foi possível carregar a foto."));
 	}
 	
 }
