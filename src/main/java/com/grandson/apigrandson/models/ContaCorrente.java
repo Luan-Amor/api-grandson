@@ -21,6 +21,8 @@ public class ContaCorrente {
 	private String banco;
 	private String tipo;
 	
+	public ContaCorrente() {}
+	
 	public ContaCorrente(int agencia, int conta, String banco, String tipo, String nome) {
 		this.nomeBenecifiario = nome;
 		this.agencia = agencia;
