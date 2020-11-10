@@ -21,6 +21,7 @@ import com.grandson.apigrandson.Service.TransacaoService;
 import com.grandson.apigrandson.config.security.TokenService;
 import com.grandson.apigrandson.controller.cliente.dto.ServicoDetalhadoParceiroDto;
 import com.grandson.apigrandson.controller.cliente.dto.ServicosConcluidosClienteDto;
+import com.grandson.apigrandson.controller.cliente.dto.ServicosDisponiveisClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
@@ -65,14 +66,14 @@ public class ServicoClienteController {
 	private TransacaoService transacao;
 	
 	@GetMapping("/agendados")
-	public List<ServicoDisponiveisParceiroDto> listarProximosServicos(HttpServletRequest request){
+	public List<ServicosDisponiveisClienteDto> listarProximosServicos(HttpServletRequest request){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
 			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
-			return ServicoDisponiveisParceiroDto.converte(parceiros);
+			return ServicosDisponiveisClienteDto.converte(parceiros);
 		}
 		return null;
 	}

@@ -30,7 +30,7 @@ public class ServicosDisponiveisClienteDto {
 		}
 	}
 
-	public static List<ServicoDisponiveisParceiroDto> converte(List<Servico> servicos) {
-		return servicos.stream().map(ServicoDisponiveisParceiroDto :: new).collect(Collectors.toList());
+	public static List<ServicosDisponiveisClienteDto> converte(List<Servico> servicos) {
+		return servicos.stream().map(ServicosDisponiveisClienteDto :: new).collect(Collectors.toList());
 	}
 }
