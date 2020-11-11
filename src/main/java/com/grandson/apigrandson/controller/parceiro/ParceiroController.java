@@ -23,16 +23,19 @@ import com.grandson.apigrandson.controller.cliente.form.EsqueciASenhaForm;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.comum.form.AtualizarSenhaForm;
 import com.grandson.apigrandson.controller.parceiro.dto.PerfilParceiroDto;
+import com.grandson.apigrandson.controller.parceiro.dto.BancosDto;
 import com.grandson.apigrandson.controller.parceiro.dto.DetalheContaCorrenteDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroAtualizaForm;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroForm;
 import com.grandson.apigrandson.controller.parceiro.form.contaCorrenteAtualizacaoForm;
+import com.grandson.apigrandson.models.Bancos;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.ContaCorrente;
 import com.grandson.apigrandson.models.Parceiro;
 import com.grandson.apigrandson.models.Servico;
 import com.grandson.apigrandson.models.StatusServico;
+import com.grandson.apigrandson.repository.BancosRepository;
 import com.grandson.apigrandson.repository.ClienteRepository;
 import com.grandson.apigrandson.repository.ContaCorrenteRepository;
 import com.grandson.apigrandson.repository.EnderecoRepository;
@@ -60,6 +63,9 @@ public class ParceiroController{
 	
 	@Autowired
 	private TokenService tokenService;
+	
+	@Autowired
+	private BancosRepository bancosRepository;
 	
 	@GetMapping("/home")
 	public List<ServicoDisponiveisParceiroDto> servicosDisponiveis(HttpServletRequest request){
@@ -197,5 +203,11 @@ public class ParceiroController{
 			return ResponseEntity.ok().build();
 		}
 		return ResponseEntity.notFound().build();
+	}
+	
+	@GetMapping("/bancos")
+	public List<BancosDto> getListaBancos(){
+		List<Bancos> bancos = bancosRepository.findAll();
+		return BancosDto.converte(bancos);
 	}
 }

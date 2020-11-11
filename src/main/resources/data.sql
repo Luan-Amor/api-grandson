@@ -31,3 +31,17 @@ values (1, 25,'PENDENTE', 1,1, 3, 3, '2020-09-11 15:00:00', 0);
 insert into Servico(quantidade_de_horas, valor, status, cliente_id, 
 						parceiro_id, avaliacao_cliente, avaliacao_parceiro, horario, idtransacao)
 values (3, 75,'FINALIZADO', 1,1, 3, 3, '2020-09-11 18:00:00', 0);
+
+
+
+-- Estáticos
+
+insert into Bancos(codigo, banco) values('001', 'Banco do Brasil');
+insert into Bancos(codigo, banco) values('070', 'BRB - Banco de Brasília');
+insert into Bancos(codigo, banco) values('104', 'Caixa econômica Federal');
+insert into Bancos(codigo, banco) values('077', 'Banco Inter');
+insert into Bancos(codigo, banco) values('756', 'Bancoob');
+insert into Bancos(codigo, banco) values('260', 'NU Pagamentos S.A');
+insert into Bancos(codigo, banco) values('184', 'BCO ITAÚ BBA S.A');
+insert into Bancos(codigo, banco) values('394', 'BCO BRADESCO FINANC. S.A');
+insert into Bancos(codigo, banco) values('033', 'BCO SANTANDER (BRASIL) S.A');
