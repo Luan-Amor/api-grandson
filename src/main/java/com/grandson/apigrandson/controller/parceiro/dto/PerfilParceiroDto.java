@@ -28,7 +28,7 @@ public class PerfilParceiroDto {
 	private LocalDateTime dataInicio;
 	private Long quantidadeServico;
 	
-	private List<ComentarioDto> comentarios = new ArrayList<ComentarioDto>();
+	private List<ComentariosParceiroDto> comentarios = new ArrayList<ComentariosParceiroDto>();
 	
 	public PerfilParceiroDto() {}
 	
@@ -45,8 +45,8 @@ public class PerfilParceiroDto {
 		if(parceiro.getFoto() != null) 
 			this.foto = new FotoDto(parceiro.getFoto());
 			
-		if(!parceiro.getComentarios().isEmpty())
-			this.comentarios.addAll(parceiro.getComentarios().stream().map(ComentarioDto::new).collect(Collectors.toList()));
+			this.comentarios = parceiro.getComentarios().stream().map(ComentariosParceiroDto::new)
+					.filter(o -> o.getTexto() != null).collect(Collectors.toList());
 		
 		
 		this.endereco = new EnderecoDto(parceiro.getEndereco());

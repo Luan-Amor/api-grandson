@@ -31,7 +31,7 @@ public class AvaliarServiçoParceiroForm {
 			Comentario comentario = new Comentario();
 			comentario.setCliente(servico.getCliente());
 			comentario.setParceiro(parceiro);
-			comentario.setComentarioParceiro(this.comentario);
+			comentario.setComentarioCliente(this.comentario);
 			comentarioRepository.save(comentario);
 		}
 		
