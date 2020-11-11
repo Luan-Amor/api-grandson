@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import com.grandson.apigrandson.controller.comum.dto.ComentarioDto;
 import com.grandson.apigrandson.controller.comum.dto.EnderecoDto;
 import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ComentariosParceiroDto;
@@ -24,7 +25,7 @@ public class DetalheClienteDto {
 	private FotoDto foto;
 	private EnderecoDto endereco;
 	private Long quantidadeServico;
-	private List<ComentariosParceiroDto> comentarios = new ArrayList<ComentariosParceiroDto>();
+	private List<ComentarioDto> comentarios = new ArrayList<ComentarioDto>();
 	
 	public DetalheClienteDto() {}
 	
@@ -38,7 +39,8 @@ public class DetalheClienteDto {
 		this.foto = new FotoDto(cliente.getFoto());
 		this.endereco = new EnderecoDto(cliente.getEndereco());
 		this.quantidadeServico = cliente.getQuantidadeServicos();
-		this.comentarios = cliente.getComentarios().stream().map(ComentariosParceiroDto::new).collect(Collectors.toList());
+		this.comentarios = cliente.getComentarios().stream().map(ComentarioDto::new)
+				.filter(o -> o.getTexto() != null).collect(Collectors.toList());
 	}
 	
 	
