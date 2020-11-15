@@ -132,7 +132,6 @@ public class ClienteController {
 		
 	}
 	
-
 	@PutMapping
 	@Transactional
 	public ResponseEntity<PerfilClienteDto> alterar(HttpServletRequest request, @RequestBody ClienteAtualizacaoForm form) {

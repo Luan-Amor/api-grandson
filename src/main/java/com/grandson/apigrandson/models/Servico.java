@@ -33,6 +33,7 @@ public class Servico {
 	private LocalDateTime horarioDoPedido = LocalDateTime.now();
 	private int idtransacao;
 	private String descricao;
+	private String motivoCancelamento;
 	
 	@Enumerated(EnumType.STRING)
 	private StatusServico status = StatusServico.PENDENTE;

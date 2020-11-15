@@ -22,6 +22,7 @@ public class ServicoDetalhadoParceiroDto {
 	private String horario;
 	private String dia;
 	private EnderecoDto endereco;
+	private String descricao;
 	
 	public ServicoDetalhadoParceiroDto() {}
 	
@@ -37,6 +38,7 @@ public class ServicoDetalhadoParceiroDto {
 			this.quantidadeHoras = servico.getQuantidadeDeHoras();
 			this.horario = servico.getHorario().format(DateTimeFormatter.ISO_LOCAL_TIME);
 			this.dia = servico.getHorario().format(DateTimeFormatter.ISO_DATE);
+			this.descricao = servico.getDescricao();
 			
 			this.endereco = new EnderecoDto(servico.getEndereco());
 		}

@@ -18,6 +18,7 @@ public class ServicoDetalhadoClienteDto {
 	private String telefone;
 	private FotoDto foto;
 	private EnderecoDto endereco;
+	private String descricao;
 	
 	private Long idServico;
 	private double quantidadeHoras;
@@ -31,6 +32,7 @@ public class ServicoDetalhadoClienteDto {
 		this.nota = servico.getCliente().getNota();
 		this.telefone = servico.getCliente().getTelefone();
 		this.foto = new FotoDto(servico.getCliente().getFoto());
+		this.descricao = servico.getDescricao();
 		
 		this.idServico = servico.getId();
 		this.valor = (servico.getValor() / 2);

@@ -24,6 +24,7 @@ import com.grandson.apigrandson.controller.cliente.dto.ServicosConcluidosCliente
 import com.grandson.apigrandson.controller.cliente.dto.ServicosDisponiveisClienteDto;
 import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroForm;
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
+import com.grandson.apigrandson.controller.cliente.form.MotivoCancelamentoForm;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.models.Cliente;
@@ -132,13 +133,15 @@ public class ServicoClienteController {
 	
 	@PutMapping("/cancelar/{id}")
 	@Transactional
-	public ResponseEntity<MensagensDto> cancelar(HttpServletRequest request, @PathVariable Long id) throws PagarMeException{
+	public ResponseEntity<MensagensDto> cancelar(HttpServletRequest request, 
+								@PathVariable Long id, @RequestBody MotivoCancelamentoForm form) throws PagarMeException{
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Optional<Servico> servico = servicoRepository.findById(id);
 			if(servico.isPresent()) {
 				servico.get().setStatus(StatusServico.CANCELADO);
-				Transaction t = transacao.executarExtorno(servico.get());
+				servico.get().setMotivoCancelamento(form.getMotivo());
+				transacao.executarExtorno(servico.get());
 				return ResponseEntity.ok(new MensagensDto("Serviço cancelado com sucesso."));
 			}
 		}

@@ -8,6 +8,7 @@ import lombok.Getter;
 public class DetalheContaCorrenteDto {
 
 	private Long id;
+	private String nomeBeneficiario; 
 	private int agencia;
 	private int conta;
 	private String banco;
@@ -15,6 +16,7 @@ public class DetalheContaCorrenteDto {
 
 	public DetalheContaCorrenteDto(ContaCorrente contaCorrente) {
 		this.id = contaCorrente.getId();
+		this.nomeBeneficiario = contaCorrente.getNomeBenecifiario();
 		this.agencia = contaCorrente.getAgencia();
 		this.conta = contaCorrente.getConta();
 		this.banco = contaCorrente.getBanco();

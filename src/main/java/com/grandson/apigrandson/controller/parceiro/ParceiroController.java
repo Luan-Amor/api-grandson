@@ -28,7 +28,7 @@ import com.grandson.apigrandson.controller.parceiro.dto.DetalheContaCorrenteDto;
 import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroAtualizaForm;
 import com.grandson.apigrandson.controller.parceiro.form.ParceiroForm;
-import com.grandson.apigrandson.controller.parceiro.form.contaCorrenteAtualizacaoForm;
+import com.grandson.apigrandson.controller.parceiro.form.ContaCorrenteAtualizacaoForm;
 import com.grandson.apigrandson.models.Bancos;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.ContaCorrente;
@@ -164,8 +164,7 @@ public class ParceiroController{
 	
 	@PutMapping("/perfil/carteira")
 	@Transactional
-	public ResponseEntity<MensagensDto> alterarCartao(HttpServletRequest request, 
-									@RequestBody contaCorrenteAtualizacaoForm form) {
+	public ResponseEntity<MensagensDto> alterarCartao(@RequestBody ContaCorrenteAtualizacaoForm form, HttpServletRequest request) {
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);

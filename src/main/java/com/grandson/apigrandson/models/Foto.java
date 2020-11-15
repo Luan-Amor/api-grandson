@@ -19,7 +19,6 @@ public class Foto {
 	private String nome;
 	private String type;
 	
-	@Lob
 	private byte[] data;
 	
 	public Foto() {}

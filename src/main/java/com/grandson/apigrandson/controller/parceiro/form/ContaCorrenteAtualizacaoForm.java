@@ -4,7 +4,10 @@ import com.grandson.apigrandson.models.ContaCorrente;
 import com.grandson.apigrandson.models.Parceiro;
 import com.grandson.apigrandson.repository.ContaCorrenteRepository;
 
-public class contaCorrenteAtualizacaoForm {
+import lombok.Data;
+
+@Data
+public class ContaCorrenteAtualizacaoForm {
 
 	private String nome;
 	private int agencia;

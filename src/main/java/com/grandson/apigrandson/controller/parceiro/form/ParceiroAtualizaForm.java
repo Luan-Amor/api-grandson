@@ -14,6 +14,8 @@ public class ParceiroAtualizaForm {
 	private Long cep;
 	private String complemento;
 	private int numero;
+	private String cidade;
+	private String estado;
 	
 	
 	public Parceiro atualizar(Parceiro parceiro) {
@@ -31,6 +33,9 @@ public class ParceiroAtualizaForm {
 			parceiro.getEndereco().setNumero(numero);
 		if(complemento != null && !complemento.isEmpty())
 			parceiro.getEndereco().setComplemento(complemento);
+		
+		parceiro.getEndereco().setEstado(estado);
+		parceiro.getEndereco().setCidade(cidade);
 		
 		return parceiro;
 	}
