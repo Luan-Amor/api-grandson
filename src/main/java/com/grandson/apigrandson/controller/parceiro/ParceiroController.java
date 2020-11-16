@@ -138,7 +138,7 @@ public class ParceiroController{
 			if(parceiro.isPresent()) {
 				Optional<ContaCorrente> cartao = contaCorrenteRepository.findById(parceiro.get().getConta().getId());
 				if(cartao.isPresent()) {
-					return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao.get()));
+					return ResponseEntity.ok(new DetalheContaCorrenteDto(cartao.get(), parceiro.get().getSaldo()));
 				}
 			}
 		}

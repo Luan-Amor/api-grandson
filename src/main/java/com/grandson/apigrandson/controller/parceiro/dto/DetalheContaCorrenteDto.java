@@ -13,14 +13,16 @@ public class DetalheContaCorrenteDto {
 	private int conta;
 	private String banco;
 	private String tipo;
+	private double valor;
 
-	public DetalheContaCorrenteDto(ContaCorrente contaCorrente) {
+	public DetalheContaCorrenteDto(ContaCorrente contaCorrente, double saldo) {
 		this.id = contaCorrente.getId();
 		this.nomeBeneficiario = contaCorrente.getNomeBenecifiario();
 		this.agencia = contaCorrente.getAgencia();
 		this.conta = contaCorrente.getConta();
 		this.banco = contaCorrente.getBanco();
 		this.tipo = contaCorrente.getTipo();
+		this.valor = saldo;
 	}
 	
 	
