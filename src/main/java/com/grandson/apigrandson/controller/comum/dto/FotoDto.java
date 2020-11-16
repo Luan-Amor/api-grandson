@@ -9,6 +9,8 @@ public class FotoDto {
 
 	private byte[] data;
 	
+	public FotoDto() {}
+	
 	public FotoDto(Foto foto){
 		if(foto != null) {			
 			this.data = foto.getData();

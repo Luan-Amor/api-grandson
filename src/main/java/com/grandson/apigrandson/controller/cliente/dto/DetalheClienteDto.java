@@ -22,7 +22,7 @@ public class DetalheClienteDto {
 	private String telefone;
 	private LocalDateTime dataInicio;
 	private String nota;
-	private FotoDto foto;
+	private FotoDto foto = new FotoDto();
 	private EnderecoDto endereco;
 	private Long quantidadeServico;
 	private List<ComentarioDto> comentarios = new ArrayList<ComentarioDto>();

@@ -19,7 +19,7 @@ public class DetalharParceiroDto {
 	private String nome;
 	private String telefone;
 	private String nota;
-	private FotoDto foto = null;
+	private FotoDto foto = new FotoDto();
 	
 	private LocalDateTime dataInicio;
 	private Long quantidadeServico;

@@ -21,7 +21,7 @@ public class PerfilParceiroDto {
 	private String email;
 	private String telefone;
 	private String nota;
-	private FotoDto foto = null;
+	private FotoDto foto = new FotoDto();
 	
 	private EnderecoDto endereco;
 	
