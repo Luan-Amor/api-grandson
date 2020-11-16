@@ -1,13 +1,12 @@
 package com.grandson.apigrandson.controller.cliente.form;
 
-import lombok.Getter;
+import lombok.Data;
 
-@Getter
+@Data
 public class MotivoCancelamentoForm {
 
 	private String motivo;
 	
-	public MotivoCancelamentoForm(String motivo){
-		this.motivo = motivo;
-	}
+	public MotivoCancelamentoForm(){}
+
 }
