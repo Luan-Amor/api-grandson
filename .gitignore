@@ -33,4 +33,4 @@ build/
 .vscode/
 
 ## APLICAÇÃO ##
-/apigrandson/src/main/resources/application.properties
+!**/src/main/resources/application
