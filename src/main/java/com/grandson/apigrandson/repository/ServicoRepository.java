@@ -33,9 +33,10 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
 											Pageable paginacao);
 	
 	@Query("select s from Servico s where s.parceiro = :parceiro and s.status = :status or  s.status = :status1")
-	public List<Servico> findServicosStatus(@Param("parceiro") Parceiro parceiro, 
+	public Page<Servico> findServicosStatus(@Param("parceiro") Parceiro parceiro, 
 											@Param("status")StatusServico status, 
-											@Param("status1")StatusServico status1);
+											@Param("status1")StatusServico status1,
+											Pageable paginacao);
 
 	@Query("select AVG(s.avaliacaoParceiro) from Servico s where s.parceiro = :parceiro")
 	public double getMediaAvaliacaoParceiro(@Param("parceiro") Parceiro parceiro);

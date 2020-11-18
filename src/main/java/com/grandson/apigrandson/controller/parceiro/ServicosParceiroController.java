@@ -7,6 +7,9 @@ import java.util.Optional;
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -59,29 +62,31 @@ public class ServicosParceiroController {
 	
 	
 	@GetMapping("/agendados")
-	public List<ServicosAgendadosDto> listarProximosServicos(HttpServletRequest request){
+	public Page<ServicosAgendadosDto> listarProximosServicos(HttpServletRequest request,
+			@PageableDefault(page = 0, size = 5) Pageable paginacao){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Parceiro parceiro = parceiroRepository.getOne(id);
-			List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.ACEITO);
+			Page<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.ACEITO, paginacao);
 			return ServicosAgendadosDto.converte(clientes);
 		}
-		return new ArrayList<ServicosAgendadosDto>(); 
+		return null; 
 	}
 	
 	@GetMapping("/concluidos")
-	public List<ServicosAgendadosDto> listarServicosConcluidos(HttpServletRequest request){
+	public Page<ServicosAgendadosDto> listarServicosConcluidos(HttpServletRequest request, 
+			@PageableDefault(size = 5, page = 0) Pageable paginacao){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Parceiro parceiro = parceiroRepository.getOne(id);
-			List<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.AVALIADO, StatusServico.CONCLUIDO);
+			Page<Servico> clientes = servicoRepository.findServicosStatus(parceiro, StatusServico.AVALIADO, StatusServico.CONCLUIDO, paginacao);
 			return ServicosAgendadosDto.converte(clientes);
 		}
-		return new ArrayList<ServicosAgendadosDto>();
+		return null;
 	}
 	
 	@GetMapping("/detalhar/{id}")

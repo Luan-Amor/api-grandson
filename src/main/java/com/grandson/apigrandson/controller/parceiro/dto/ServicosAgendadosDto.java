@@ -3,6 +3,8 @@ package com.grandson.apigrandson.controller.parceiro.dto;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.domain.Page;
+
 import com.grandson.apigrandson.controller.comum.dto.FotoDto;
 import com.grandson.apigrandson.models.Foto;
 import com.grandson.apigrandson.models.Servico;
@@ -28,8 +30,8 @@ public class ServicosAgendadosDto {
 		this.foto = new FotoDto(servico.getCliente().getFoto());
 	}
 
-	public static List<ServicosAgendadosDto> converte(List<Servico> clientes) {
-		return clientes.stream().map(ServicosAgendadosDto::new).collect(Collectors.toList());
+	public static Page<ServicosAgendadosDto> converte(Page<Servico> clientes) {
+		return clientes.map(ServicosAgendadosDto::new);
 	}
 	
 	
