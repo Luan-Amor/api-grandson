@@ -3,6 +3,8 @@ package com.grandson.apigrandson.repository;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -21,12 +23,14 @@ public interface ServicoRepository extends JpaRepository<Servico, Long> {
 	public List<Servico> findByCliente(Long id);
 	
 	@Query("select s from Servico s where s.cliente = :cliente and s.status = :status ")
-	public List<Servico> findServicosStatus(@Param("cliente") Cliente cliente, 
-											@Param("status") StatusServico status);
+	public Page<Servico> findServicosStatus(@Param("cliente") Cliente cliente, 
+											@Param("status") StatusServico status,
+											Pageable paginacao);
 	
 	@Query("select s from Servico s where s.parceiro = :parceiro and s.status = :status ")
-	public List<Servico> findServicosStatus(@Param("parceiro") Parceiro parceiro, 
-											@Param("status") StatusServico status);
+	public Page<Servico> findServicosStatus(@Param("parceiro") Parceiro parceiro, 
+											@Param("status") StatusServico status,
+											Pageable paginacao);
 	
 	@Query("select s from Servico s where s.parceiro = :parceiro and s.status = :status or  s.status = :status1")
 	public List<Servico> findServicosStatus(@Param("parceiro") Parceiro parceiro, 

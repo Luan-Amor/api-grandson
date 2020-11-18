@@ -1,12 +1,14 @@
 package com.grandson.apigrandson.controller.parceiro;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -68,15 +70,16 @@ public class ParceiroController{
 	private BancosRepository bancosRepository;
 	
 	@GetMapping("/home")
-	public List<ServicoDisponiveisParceiroDto> servicosDisponiveis(HttpServletRequest request){
+	public Page<ServicoDisponiveisParceiroDto> servicosDisponiveis(HttpServletRequest request, 
+			@PageableDefault(page= 0, size = 5) Pageable paginacao){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			Parceiro parceiro = parceiroRepository.getOne(id);
-			List<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE);
+			Page<Servico> servicos = servicoRepository.findServicosStatus(parceiro, StatusServico.PENDENTE, paginacao);
 			return ServicoDisponiveisParceiroDto.converte(servicos);
 		}
-		return new ArrayList<ServicoDisponiveisParceiroDto>();
+		return null;
 	}
 	
 	@GetMapping("/perfil")

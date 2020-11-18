@@ -1,12 +1,13 @@
 package com.grandson.apigrandson.controller.cliente;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -26,7 +27,6 @@ import com.grandson.apigrandson.controller.cliente.form.AvaliarServiçoParceiroF
 import com.grandson.apigrandson.controller.cliente.form.FormNovoServico;
 import com.grandson.apigrandson.controller.cliente.form.MotivoCancelamentoForm;
 import com.grandson.apigrandson.controller.comum.dto.MensagensDto;
-import com.grandson.apigrandson.controller.parceiro.dto.ServicoDisponiveisParceiroDto;
 import com.grandson.apigrandson.models.Cliente;
 import com.grandson.apigrandson.models.Servico;
 import com.grandson.apigrandson.models.StatusServico;
@@ -67,31 +67,33 @@ public class ServicoClienteController {
 	private TransacaoService transacao;
 	
 	@GetMapping("/agendados")
-	public List<ServicosDisponiveisClienteDto> listarProximosServicos(HttpServletRequest request){
+	public Page<ServicosDisponiveisClienteDto> listarProximosServicos(HttpServletRequest request,
+			@PageableDefault(page = 0, size = 5) Pageable paginacao){
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
-			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO);
+			Page<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.ACEITO, paginacao);
 			return ServicosDisponiveisClienteDto.converte(parceiros);
 		}
 		return null;
 	}
 	
 	@GetMapping("/concluidos")
-	public List<ServicosConcluidosClienteDto> listarServicosConcluidos(HttpServletRequest request){
-		List<ServicosConcluidosClienteDto> convertido = new ArrayList<ServicosConcluidosClienteDto>();
+	public Page<ServicosConcluidosClienteDto> listarServicosConcluidos(HttpServletRequest request, 
+			@PageableDefault(page = 0, size = 5) Pageable paginacao){
+		Page<ServicosConcluidosClienteDto> convertido;
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
 			Long id = tokenService.getIdUsuario(token);
 			
 			Cliente cliente = clienteRepository.getOne(id);
-			List<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.CONCLUIDO);
+			Page<Servico> parceiros = servicoRepository.findServicosStatus(cliente, StatusServico.CONCLUIDO, paginacao);
 			convertido = ServicosConcluidosClienteDto.converte(parceiros);
 			return convertido;
 		}
-		return convertido;
+		return null;
 	}
 	
 	@GetMapping("detalhar/{id}")

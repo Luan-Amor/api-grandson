@@ -1,13 +1,15 @@
 package com.grandson.apigrandson.controller.cliente;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort.Direction;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -57,13 +59,16 @@ public class ClienteController {
 	private TokenService tokenService;
 	
 	@GetMapping("/home")
-	public List<ListaParceiroDto> listarParceiros(HttpServletRequest request){
+	public Page<ListaParceiroDto> listarParceiros(HttpServletRequest request, 
+			@PageableDefault(page = 0,size = 5,
+				direction = Direction.ASC, sort = "id") Pageable paginacao){
+		//url?page=0&size=5&sort=id,asc
 		String token = tokenService.recuperarToken(request);
 		if(tokenService.isTokenValido(token)) {
-			List<Parceiro> parceiros = parceiroRepository.findAll();
+			Page<Parceiro> parceiros = parceiroRepository.findAll(paginacao);
 			return ListaParceiroDto.converte(parceiros);			
 		}
-		return new ArrayList<ListaParceiroDto>();
+		return null;
 	}
 	
 	@GetMapping("/perfil/parceiro/{id}")
